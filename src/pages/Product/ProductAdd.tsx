@@ -3,12 +3,12 @@ import { useAppDispatch } from '../../hooks/customHooks'; // Adjust the import p
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Product } from '../../types/productType';
-import { addProduct, updateProduct } from '../../store/Slice/ProductSlice'; // Adjust your import for update
+import { addProduct, ProductActions, updateProduct } from '../../store/Slice/ProductSlice'; // Adjust your import for update
 
 interface ProductAddProps {
   onClose: () => void;
   isEdit?: boolean; // To differentiate between add and update
-  existingProduct?: Product; // Product to update
+  existingProduct?: Product | null; // Product to update
 }
 
 const ProductAddForm: React.FC<ProductAddProps> = ({
@@ -50,6 +50,7 @@ const ProductAddForm: React.FC<ProductAddProps> = ({
       if (isEdit) {
         // Only update unit price
         result = await dispatch(updateProduct(product!)).unwrap();
+        dispatch(ProductActions.departmentAdded(product));
         console.log('Product updated successfully:', result);
       } else {
         // Add new product

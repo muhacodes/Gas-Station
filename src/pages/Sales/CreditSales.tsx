@@ -79,24 +79,6 @@ const CreditSales = () => {
                 />
                 <tbody>
                   <TableBody data={CreditSales} fields={tableRow} />
-                  {/* {ProductTank.Tank.map((tank) => (
-                    <tr key={tank.id}>
-                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        {tank.name}
-                      </td>
-                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        {tank.product?.name}
-                      </td>
-
-                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        {tank.capacity}
-                      </td>
-
-                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        {tank.litres}
-                      </td>
-                    </tr>
-                  ))} */}
                 </tbody>
               </table>
             </div>
