@@ -8,16 +8,17 @@ import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import { addCreditSales, fetchPumpSummary} from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { CreditSale } from '../../types/finance';
+import { CreditSale, ExpenseType } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
+import { addExpense } from '../../store/Slice/Expenses';
 
-const CreditSalesAdd = () => {
+const ExpenseAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
   const meter = useAppSelector((state) => state.tank.Meter);
-  const creditor = useAppSelector((state) => state.sales.creditors);
+  const pump = useAppSelector((state) => state.product.pump);
 
   interface Option {
     value: string;
@@ -33,13 +34,13 @@ const CreditSalesAdd = () => {
     autocompleteOptions?: Option[];
   };
 
-  const handleSubmit = async (data: CreditSale) => {
+  const handleSubmit = async (data: ExpenseType) => {
     setLoading(true);
     try {
       console.log(data);
-      await dispatch(addCreditSales(data)).unwrap(); // Unwrap to catch the error
+      await dispatch(addExpense(data)).unwrap(); // Unwrap to catch the error
       await dispatch(fetchPumpSummary()).unwrap()
-        navigate('/credit/sales');
+        navigate('/expenses');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -57,7 +58,7 @@ const CreditSalesAdd = () => {
       setLoading(false);
     }
   };
-  const fields: FormField<CreditSale>[] = [
+  const fields: FormField<ExpenseType>[] = [
     {
       name: 'date',
       label: 'Date',
@@ -65,39 +66,39 @@ const CreditSalesAdd = () => {
       //   required: true,
     },
     {
-      name: 'creditor',
-      label: 'creditor',
+      name: 'name',
+      label: 'Expense Name',
+      type: 'text',
+      //   required: true,
+    },
+    {
+      name: 'pump',
+      label: 'Pump',
       type: 'autocomplete',
       //   required: true,
-      autocompleteOptions: creditor.map((value) => ({
+      autocompleteOptions: pump.map((value) => ({
         value: value.id!,
-        label: `${value.company} - ${value.customer}`,
+        label: value.name
       })),
     },
 
+
     {
-      name: 'litres',
-      label: 'Litres',
+      name: 'amount',
+      label: 'Amount',
       type: 'text',
       //   required: true,
     },
 
-    {
-      name: 'Meter',
-      label: 'Meter',
-      type: 'select',
-      options: meter.map((tank) => ({
-        value: tank.id!,
-        label: tank.name,
-      })),
-    },
-
-    {
-      name: 'discount',
-      label: 'Discount - @',
-      type: 'text',
-      //   required: true,
-    },
+    // {
+    //   name: 'Meter',
+    //   label: 'Meter',
+    //   type: 'select',
+    //   options: meter.map((tank) => ({
+    //     value: tank.id!,
+    //     label: tank.name,
+    //   })),
+    // },
 
     {
       name: 'shift',
@@ -121,8 +122,8 @@ const CreditSalesAdd = () => {
         </div>
       )}
       <div className="mx-auto">
-        <Breadcrumb pageName="Credit Sales  / Add " />
-        <FormContainerComponent<CreditSale>
+        <Breadcrumb pageName="Expense / Add " />
+        <FormContainerComponent<ExpenseType>
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
@@ -135,4 +136,4 @@ const CreditSalesAdd = () => {
   );
 };
 
-export default CreditSalesAdd;
+export default ExpenseAdd;

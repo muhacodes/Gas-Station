@@ -4,23 +4,29 @@ import { fetchWithTokenRefresh } from '../helpers/appUtils';
 import { Product, Pump, Stock } from '../../types/productType';
 import { handleAsyncThunk } from '../helpers/handleasyncthunk';
 import { RootState } from '../store';
-import { sales } from '../../types/sales';
+import { payment_drop_type, pump_sales_type, sales, sales_payment_type } from '../../types/sales';
 import { Creditor, CreditSale, Discount } from '../../types/finance';
 
-interface SalesState {
+interface SalesCreditState {
   sales: sales[];
   creditors: Creditor[];
   creditSales : CreditSale[],
+  sales_payment : sales_payment_type[],
+  pump_sales : pump_sales_type[],
+  drop: payment_drop_type[],
   discount: Discount[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: SalesState = {
+const initialState: SalesCreditState = {
   sales: [],
   discount: [],
   creditors: [],
   creditSales : [],
+  sales_payment : [],
+  pump_sales : [],
+  drop : [],
   error: null,
   loading: false,
 };
@@ -37,7 +43,6 @@ export const fetchSales = createAsyncThunk(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
-      console.log(data);
       return data; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -91,6 +96,29 @@ export const fetchCreditors = createAsyncThunk(
   },
 );
 
+export const DeleteCreditors = createAsyncThunk(
+  'creditor/delete',
+  async (newCreditor: Creditor, thunkAPI) => {
+    const url = `${config.appUrl}/api/creditors/${newCreditor.id}`;
+    try {
+      const response = await fetchWithTokenRefresh(url, {
+        method: 'Delete',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCreditor),
+      });
+    
+      if(!response.ok){
+        return thunkAPI.rejectWithValue({'error' : 'something went wrong'});
+      }
+      return newCreditor;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
 export const addCreditors = createAsyncThunk(
   'creditor/add',
   async (newCreditor: Creditor, thunkAPI) => {
@@ -129,7 +157,6 @@ export const fetchCreditSales = createAsyncThunk(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
-      console.log(data);
       return data; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -175,7 +202,6 @@ export const fetchDiscount = createAsyncThunk(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
-      console.log(data);
       return data; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -210,6 +236,120 @@ export const addDiscount = createAsyncThunk(
 );
 
 
+export const fetchDrop = createAsyncThunk(
+  'drop/fetch',
+  async (_, thunkAPI) => {
+    const url = `${config.appUrl}/api/sales_drop`;
+    try {
+      const response = await fetchWithTokenRefresh(url);
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+
+export const addDrop = createAsyncThunk(
+  'drop/add',
+  async (postData: payment_drop_type, thunkAPI) => {
+    const url = `${config.appUrl}/api/sales_drop`;
+    try {
+      const response = await fetchWithTokenRefresh(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const fetchPumpSummary = createAsyncThunk(
+  'pump/summary',
+  async (_, thunkAPI) => {
+    const url = `${config.appUrl}/api/pump/summary`;
+    try {
+      const response = await fetchWithTokenRefresh(url);
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+
+
+
+export const fetchSalesPayment = createAsyncThunk(
+  'salesPayment/fetch',
+  async (_, thunkAPI) => {
+    const url = `${config.appUrl}/api/sales_payment`;
+    try {
+      const response = await fetchWithTokenRefresh(url);
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const addSalesPayment = createAsyncThunk(
+  'salesPayment/add',
+  async (postData: sales_payment_type, thunkAPI) => {
+    const url = `${config.appUrl}/api/sales_payment`;
+    try {
+      const response = await fetchWithTokenRefresh(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+
 
 export const SalesSlice = createSlice({
   name: 'sales',
@@ -217,13 +357,13 @@ export const SalesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     // Handle fetchProduct
-    handleAsyncThunk<SalesState, sales[], void>(builder, fetchSales, {
+    handleAsyncThunk<SalesCreditState, sales[], void>(builder, fetchSales, {
       dataKey: 'sales',
       errorKey: 'error',
       loadingKey: 'loading',
     });
     // Handle addProduct
-    handleAsyncThunk<SalesState, sales, sales>(builder, addSales, {
+    handleAsyncThunk<SalesCreditState, sales, sales>(builder, addSales, {
       dataKey: 'sales',
       append: true,
       errorKey: 'error',
@@ -231,28 +371,36 @@ export const SalesSlice = createSlice({
     });
 
     // Handle fetchStock
-    handleAsyncThunk<SalesState, Creditor[], void>(builder, fetchCreditors, {
+    handleAsyncThunk<SalesCreditState, Creditor[], void>(builder, fetchCreditors, {
       dataKey: 'creditors',
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
     // Handle addStock
-    handleAsyncThunk<SalesState, Creditor, Creditor>(builder, addCreditors, {
+    handleAsyncThunk<SalesCreditState, Creditor, Creditor>(builder, addCreditors, {
       dataKey: 'creditors',
       append: true,
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
-    handleAsyncThunk<SalesState, CreditSale[], void>(builder, fetchCreditSales, {
+    handleAsyncThunk<SalesCreditState, Creditor, Creditor>(builder, DeleteCreditors, {
+      dataKey: 'creditors',
+      // append: true,
+      onDelete : true,
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+    handleAsyncThunk<SalesCreditState, CreditSale[], void>(builder, fetchCreditSales, {
       dataKey: 'creditSales',
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
     // Handle addStock
-    handleAsyncThunk<SalesState, CreditSale, CreditSale>(builder, addCreditSales, {
+    handleAsyncThunk<SalesCreditState, CreditSale, CreditSale>(builder, addCreditSales, {
       dataKey: 'creditSales',
       append: true,
       errorKey: 'error',
@@ -260,16 +408,49 @@ export const SalesSlice = createSlice({
     });
 
     // Handle fetchStock
-    handleAsyncThunk<SalesState, Discount[], void>(builder, fetchDiscount, {
+    handleAsyncThunk<SalesCreditState, Discount[], void>(builder, fetchDiscount, {
       dataKey: 'discount',
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
     // Handle addStock
-    handleAsyncThunk<SalesState, Discount, Discount>(builder, addDiscount, {
+    handleAsyncThunk<SalesCreditState, Discount, Discount>(builder, addDiscount, {
       dataKey: 'discount',
       append: true,
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+    handleAsyncThunk<SalesCreditState, sales_payment_type[], void>(builder, fetchSalesPayment, {
+      dataKey: 'sales_payment',
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+    handleAsyncThunk<SalesCreditState, sales_payment_type, sales_payment_type>(builder, addSalesPayment, {
+      dataKey: 'sales_payment',
+      append: true,
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+    handleAsyncThunk<SalesCreditState, payment_drop_type[], void>(builder, fetchDrop, {
+      dataKey: 'drop',
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+    handleAsyncThunk<SalesCreditState, payment_drop_type, payment_drop_type>(builder, addDrop, {
+      dataKey: 'drop',
+      append: true,
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
+
+
+    handleAsyncThunk<SalesCreditState, pump_sales_type[], void>(builder, fetchPumpSummary, {
+      dataKey: 'pump_sales',
       errorKey: 'error',
       loadingKey: 'loading',
     });

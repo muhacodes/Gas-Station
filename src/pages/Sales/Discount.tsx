@@ -1,36 +1,37 @@
-import { useState } from 'react';
-import {useAppSelector } from '../../hooks/customHooks';
+import {  useState } from 'react';
+
+import {  useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
-import { TankDipping as TankDippingType } from '../../types/productType';
+import { Discount as DiscountType } from '../../types/finance';
 
-const TankDipping = () => {
-  const Data = useAppSelector((state) => state.tank.TankDipping);
+const Discount = () => {
+  const Data = useAppSelector((state) => state.sales.discount);
   const [query, setQuery] = useState(''); // State to manage the search query
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof TankDippingType)[] = [
+  const tableRow: (keyof DiscountType | string)[] = [
     'date',
-    'Tank',
-    'opening',
-    'closing',
-    'expected_sales',
-    'metre_sales',
-    'variance',
+    'product.name',
+    'customer',
+    'litres',
+    'unit_price',
+    'amount',
+    'total_amount',
   ];
   const customTitles = {
-    expected_sales : 'Expected Sales',
-    metre_sales : 'Meter Sales',
-    'tank.name' : 'Tank',
+    total_amount : 'total amount',
+    unit_price : 'Unit Price',
+    'product.name' : 'Product'
+
   };
 
-  const moneyFields: (keyof TankDippingType)[] = ['closing', 'expected_sales', 'metre_sales', ];
+  const moneyFields: (keyof DiscountType)[] = ['amount', 'total_amount', 'unit_price'];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
@@ -42,7 +43,9 @@ const TankDipping = () => {
     if (query) {
       filtered = Data.filter((data) => {
         // return data.company?.toLocaleLowerCase?.includes(query) || data.customer.includes(query);
-        return data.date.includes(query.toLocaleLowerCase());
+        return (
+          data.customer.toLocaleLowerCase().includes(query.toLocaleLowerCase()) || data.date.includes(query)
+        );
       });
       // filtered = Data.filter((sale) => Data.date.includes(query));
     }
@@ -53,20 +56,20 @@ const TankDipping = () => {
     const currentData = filtered.slice(indexOfFirstData, indexOfLastData);
 
     return currentData;
-  }
-  
+  };
+
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Tank Dipping " />
+        <Breadcrumb pageName="Discount " />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
           customTitles={customTitles}
           moneyFields={moneyFields}
           filterData={filterData}
-          newEntryUrl="tank-dipping-add"
-          filterDataBy="Date"
+          newEntryUrl="discount/add"
+          filterDataBy="Date, customer"
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -80,4 +83,4 @@ const TankDipping = () => {
   );
 };
 
-export default TankDipping;
+export default Discount;

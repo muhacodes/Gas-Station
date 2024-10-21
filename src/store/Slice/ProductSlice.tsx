@@ -75,16 +75,16 @@ export const addProduct = createAsyncThunk(
 );
 
 export const updateProduct = createAsyncThunk(
-  'product/add',
-  async (product: Product, thunkAPI) => {
-    const url = `${config.appUrl}/api/product/${product.id}/`;
+  'product/update',
+  async ({id, unit_price}: Product, thunkAPI) => {
+    const url = `${config.appUrl}/api/product/${id}/`;
     try {
       const response = await fetchWithTokenRefresh(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ product }),
+        body: JSON.stringify({ unit_price }),
       });
       if (!response.ok) {
         // If the response is not ok, throw an error with the response message
@@ -196,7 +196,14 @@ export const addPump = createAsyncThunk(
 export const ProductSlice = createSlice({
   name: 'product',
   initialState,
-  reducers: {},
+  reducers: {
+    UpdateProduct: (state, action: PayloadAction<Product>) => {
+      // console.log(action.payload);
+      const productIndex = state.products.findIndex((product) => product.id === action.payload.id);
+      state.products[productIndex].unit_price = action.payload.unit_price;
+      // state.list = [...state.list, action.payload];
+    },
+  },
   extraReducers: (builder) => {
     // Handle fetchProduct
     handleAsyncThunk<ProductState, Product[], void>(builder, fetchProduct, {

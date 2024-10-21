@@ -1,5 +1,5 @@
 export type Product = {
-  id: number;
+  id?: string;
   name: string; // string
   unit_price: string; // number
   station: string;
@@ -10,7 +10,7 @@ export type Stock = {
   station?: string;
   date: string; // string (Date format)
   product?: Product | null;
-  product_name?: string; // Product reference
+  // product_name?: string; // Product reference
   price: string; // number
   litres: string; // number
   Transport: string; // number
@@ -22,7 +22,7 @@ export type Stock = {
 export type Pump = {
   id?: string; // number
   name: string; // string
-  station?: string; // GasStation reference
+  station: string; // GasStation reference
 };
 
 export type Tank = {
@@ -36,10 +36,12 @@ export type Tank = {
 };
 
 export type TankDipping = {
+  station : string,
   id: string; // number
   date: string; // string (Date format)
-  tank: Tank; // Tank reference
+  Tank: Tank; // Tank reference
   opening?: string; // number
+  shift : string,
   closing: string; // number
   expected_sales?: string; // number
   supply?: string; // number

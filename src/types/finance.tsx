@@ -1,17 +1,19 @@
-import { GasStation } from "./client";
+import { GasStation, staff_type } from "./client";
 import { Meter, Product, Pump } from "./productType";
 
 export type Discount = {
-    id? : string,
     station?: string;
+    id? : string,
     date: string; // or Date if you prefer
-    product: Product;
+    product: Product | null;
     shift: 'Morning' | 'Evening';
-    litres: number;
-    unit_price: number;
+    meter : Meter | null,
+    litres: string;
+    pump?: Pump | null;
+    unit_price: string;
     customer: string;
-    amount: number;
-    total_amount: number;
+    amount: string;
+    total_amount: string;
 };
 
 export type Creditor = {
@@ -52,10 +54,13 @@ export type Payment = {
     balance: number;
 };
 
-export type Expense = {
-    // station: GasStation;
+export type ExpenseType = {
+    station: string;
+    date: string; // or Date
     name: string;
     description?: string | null;
+    shift: String | null;
+    pump?: Pump | null;
     amount: number;
-    date: string; // or Date
+    agent?: staff_type | null;
 };

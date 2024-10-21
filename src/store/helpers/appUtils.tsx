@@ -17,10 +17,14 @@ export const fetchWithTokenRefresh = async (
   options: RequestInit = {}
 ): Promise<Response> => {
 
-  if(!url.endsWith('/')){
+  if(!url.endsWith('/') && url.includes('?') === false){
     url+='/';
-
   }
+
+  // if(!url.endsWith('/')){
+    
+  // }
+  
   // const navigate = useNavigate();
   const { auth } = store.getState(); // Assuming this gives you AuthState
   let access = auth.access; // Access the access token from auth.list

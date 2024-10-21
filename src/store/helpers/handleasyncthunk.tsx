@@ -6,6 +6,7 @@ interface HandleAsyncThunkOptions<State> {
   errorKey: keyof State;
   dataKey: keyof State;
   append?: boolean;
+  onDelete?: boolean;
 }
 
 // export function handleAsyncThunk<State, Returned, ThunkArg>(
@@ -42,7 +43,13 @@ export function handleAsyncThunk<State, Returned, ThunkArg>(
   thunk: AsyncThunk<Returned, ThunkArg, {}>,
   options: HandleAsyncThunkOptions<State>,
 ) {
-  const { loadingKey, errorKey, dataKey, append = false } = options;
+  const {
+    onDelete = false,
+    loadingKey,
+    errorKey,
+    dataKey,
+    append = false,
+  } = options;
 
   builder
     .addCase(thunk.pending, (state) => {
@@ -53,6 +60,16 @@ export function handleAsyncThunk<State, Returned, ThunkArg>(
       (state as any)[loadingKey] = false;
       if (append && Array.isArray((state as any)[dataKey])) {
         ((state as any)[dataKey] as any[]).push(action.payload);
+      } else if (onDelete) {
+        const payload = action.payload as { id: string };
+
+        // Logging for verification
+        console.log('Deleted item ID:', payload.id);
+
+        // Filter out the deleted item by ID
+        (state as any)[dataKey] = (state as any)[dataKey].filter(
+          (item: any) => item.id !== payload.id,
+        );
       } else {
         (state as any)[dataKey] = action.payload;
       }

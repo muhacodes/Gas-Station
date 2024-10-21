@@ -27,6 +27,7 @@ const initialState: AuthState = {
     email: '',
     username: '',
     is_admin: false,
+    tenant : ''
   },
 };
 

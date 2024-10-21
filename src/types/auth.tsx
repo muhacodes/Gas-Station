@@ -3,6 +3,7 @@ export type userType = {
   email: string;
   username: string;
   is_admin: boolean;
+  tenant : string;
 };
 
 export type AuthUser = {

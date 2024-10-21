@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch } from '../../hooks/customHooks'; // Adjust the import path as necessary
+import { useAppDispatch, useAppSelector } from '../../hooks/customHooks'; // Adjust the import path as necessary
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Product } from '../../types/productType';
-import { addProduct, updateProduct } from '../../store/Slice/ProductSlice'; // Adjust your import for update
+import { addProduct, ProductActions, updateProduct } from '../../store/Slice/ProductSlice'; // Adjust your import for update
 
 interface ProductAddProps {
   onClose: () => void;
   isEdit?: boolean; // To differentiate between add and update
-  existingProduct?: Product; // Product to update
+  existingProduct?: Product | null; // Product to update
 }
 
 const ProductAddForm: React.FC<ProductAddProps> = ({
@@ -18,9 +18,12 @@ const ProductAddForm: React.FC<ProductAddProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  // const station = useAppSelector((state) => state.product.products)[0];
+  const station = useAppSelector((state) => state.client.station);
+  
   const [error, setError] = useState<any>({});
   const [product, setProduct] = useState<Product>({
-    id: 0,
+    id: '',
     name: '',
     station: '1',
     unit_price: '',
@@ -39,22 +42,25 @@ const ProductAddForm: React.FC<ProductAddProps> = ({
       ...prevProduct,
       [name]: value,
     }));
+    
   };
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      let result;
+    console.log("station is ", station.id);
+    try { 
+      
       if (isEdit) {
         // Only update unit price
-        result = await dispatch(updateProduct(product!)).unwrap();
-        console.log('Product updated successfully:', result);
+        await dispatch(updateProduct(product!)).unwrap();
+        dispatch(ProductActions.UpdateProduct(product));
+        console.log('Product updated successfully:', product);
       } else {
         // Add new product
-        result = await dispatch(addProduct(product)).unwrap();
-        console.log('Product added successfully:', result);
+        await dispatch(addProduct(product)).unwrap();
+        console.log('Product added successfully:', product);
       }
       onClose();
     } catch (error: any) {

@@ -1,50 +1,68 @@
 import { useState } from 'react';
-import {useAppSelector } from '../../hooks/customHooks';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+
+import { useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import { pump_sales_type } from '../../types/sales';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
-import { TankDipping as TankDippingType } from '../../types/productType';
 
-const TankDipping = () => {
-  const Data = useAppSelector((state) => state.tank.TankDipping);
+const PumpSalesSummary = () => {
+  const Data = useAppSelector((state) => state.sales.pump_sales);
   const [query, setQuery] = useState(''); // State to manage the search query
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof TankDippingType)[] = [
+  const tableRow: (keyof pump_sales_type)[] = [
     'date',
-    'Tank',
-    'opening',
-    'closing',
-    'expected_sales',
-    'metre_sales',
-    'variance',
+    'pump',
+    'shift',
+    'total_sales',
+    'total_credit',
+    'total_drop',
+    'total_sales_payment',
+    'total_expenses',
+    'short',
   ];
   const customTitles = {
-    expected_sales : 'Expected Sales',
-    metre_sales : 'Meter Sales',
-    'tank.name' : 'Tank',
+    shift: 'Shift',
+    total_sales: 'Total Sales',
+    total_sales_payment: 'Other Payments',
+    total_drop: 'Drop',
+    total_expenses: 'expenses',
   };
+  const moneyFields: (keyof pump_sales_type)[] = [
+    'total_drop',
+    'total_sales',
+    'total_sales_payment',
+    'total_credit',
+    'total_expenses',
+    'short',
+  ]; // Money-related fields
 
-  const moneyFields: (keyof TankDippingType)[] = ['closing', 'expected_sales', 'metre_sales', ];
   const filterData = (query: string) => {
-    setQuery(query); // Update search query state
+    setQuery(query.toLocaleLowerCase()); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
   };
 
   const getFilteredData = () => {
     // Step 1: Filter sales based on the query
     let filtered = Data;
+
     if (query) {
       filtered = Data.filter((data) => {
-        // return data.company?.toLocaleLowerCase?.includes(query) || data.customer.includes(query);
-        return data.date.includes(query.toLocaleLowerCase());
+        return (
+          data.date.includes(query) ||
+          data.shift.toLocaleLowerCase().includes(query) ||
+          data.pump.toLocaleLowerCase().includes(query)
+        );
       });
-      // filtered = Data.filter((sale) => Data.date.includes(query));
     }
 
     // Step 2: Apply pagination to the filtered data
@@ -53,20 +71,19 @@ const TankDipping = () => {
     const currentData = filtered.slice(indexOfFirstData, indexOfLastData);
 
     return currentData;
-  }
-  
+  };
+
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Tank Dipping " />
+        <Breadcrumb pageName="Pump Summary" />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
           customTitles={customTitles}
           moneyFields={moneyFields}
+          filterDataBy="Date, Shift, Pump"
           filterData={filterData}
-          newEntryUrl="tank-dipping-add"
-          filterDataBy="Date"
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -80,4 +97,4 @@ const TankDipping = () => {
   );
 };
 
-export default TankDipping;
+export default PumpSalesSummary;

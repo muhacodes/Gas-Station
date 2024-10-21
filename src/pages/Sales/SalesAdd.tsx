@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addSales } from '../../store/Slice/Sales';
+import { addSales, fetchPumpSummary } from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { sales } from '../../types/sales';
+import PumpSalesSummary from './PumpSaes';
 
 const SalesAdd = () => {
   const dispatch = useAppDispatch();
@@ -19,10 +20,10 @@ const SalesAdd = () => {
     station: '1',
     date: '',
     closing: '',
-    agent: '',
+    agent: '1',
     Meter: null,
     shift: '',
-    cash: '',
+    cost_price: '',
   });
 
   const handleChange = (
@@ -54,7 +55,8 @@ const SalesAdd = () => {
     setLoading(true);
     try {
       console.log(formData);
-      await dispatch(addSales(formData)).unwrap(); // Unwrap to catch the error
+      await dispatch(addSales(formData)).unwrap(); 
+      await dispatch(fetchPumpSummary()).unwrap();
       navigate('/sales');
     } catch (error: any) {
       // The error object here is the thrown responseData object
@@ -196,7 +198,7 @@ const SalesAdd = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+                  {/* <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                     <div className="w-full sm:w-1/2">
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
@@ -222,7 +224,7 @@ const SalesAdd = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row"></div>
                   <div className="flex justify-end gap-4.5">

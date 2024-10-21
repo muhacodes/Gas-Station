@@ -1,4 +1,4 @@
-import { Meter, Product } from './productType';
+import { Meter, Product, Pump } from './productType';
 
 export type sales = {
   station? : string,
@@ -14,6 +14,7 @@ export type sales = {
   difference?: string; // number | null
   rtt_litres?: string; // number | null
   rtt_amount?: string; // number | null
+  pump? : Pump | null,
   amount?: string; // number
   cash?: string; // number
   credit?: string; // number | null
@@ -22,3 +23,41 @@ export type sales = {
   cost_price?: string; // number | null
   agent: String; // Staff reference
 };
+
+
+export type pump_sales_type = {
+  date: string;
+  pump : string,
+  shift : string,
+  total_sales : string
+  total_drop : string,
+  total_expenses : string,
+  total_credit : string,
+  total_sales_payment : string,
+  short : string,
+}
+export type sales_payment_type = {
+  station? :  string,
+  date: string; // string (Date format)
+  agent : string,
+  supervisor : string,
+  shift : string,
+  money : string,
+  pump : Pump | null,
+  transaction_no : string,
+  payment_method : string,
+}
+export type payment_drop_type = {
+  station? :  string,
+  date: string; // string (Date format)
+  agent : string,
+  shift : string,
+  pump : Pump | null,
+  supervisor : string,
+  amount : string,
+}
+
+export type payment_method_type = {
+  station? :  string,
+  method : string,
+}

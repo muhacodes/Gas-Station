@@ -8,8 +8,6 @@ import { addMeter, addTank } from '../../store/Slice/Tank';
 
 interface TankAddProps {
   onClose: () => void;
-  isEdit?: boolean; // To differentiate between add and update
-  existingProduct?: Product; // Product to update
 }
 
 const MeterAdd: React.FC<TankAddProps> = ({ onClose }) => {
@@ -23,7 +21,7 @@ const MeterAdd: React.FC<TankAddProps> = ({ onClose }) => {
     pump: null,
     tank: null,
     id: '',
-    open : '',
+    open: '',
   });
 
   // Populate form fields when in edit mode
@@ -43,11 +41,11 @@ const MeterAdd: React.FC<TankAddProps> = ({ onClose }) => {
     setLoading(true);
 
     try {
-      const result = await dispatch(addMeter(formData)).unwrap();
-      console.log('Tank  added successfully:', result);
+      await dispatch(addMeter(formData)).unwrap();
+      // console.log('Meter  added successfully:', result);
       onClose();
     } catch (error: any) {
-      console.error('Failed to Add Tank:', error);
+      console.error('Failed to Add Meter:', error);
     } finally {
       setLoading(false);
     }

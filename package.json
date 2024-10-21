@@ -25,6 +25,7 @@
     "headlessui": "^0.0.0",
     "jsvectormap": "^1.5.3",
     "match-sorter": "^6.3.1",
+    "mathjs": "^13.2.0",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18.2.0",
@@ -39,6 +40,7 @@
     "sort-by": "^0.0.2"
   },
   "devDependencies": {
+    "@types/mathjs": "^9.4.2",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
     "@types/redux-persist": "^4.3.1",

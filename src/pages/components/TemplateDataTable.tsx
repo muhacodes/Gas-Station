@@ -1,30 +1,27 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useState } from 'react';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEdit,
-  faEye,
+  faBook,
+  faMoneyBill,
+  faMoneyBillWaveAlt,
   faPlus,
+  faReceipt,
+  faRemove,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-
-import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import Modal from '../../components/Modal';
-import ProductAddForm from './ProductAdd';
-import { Product } from '../../types/productType';
 import TableComponent from '../components/TableComponent';
+import { Creditor } from '../../types/finance';
 import Pagination from '../components/PaginationComponent';
 
-const ProductComponent = () => {
-  const Data = useAppSelector((state) => state.product.products);
-  const [productModal, setproductModal] = useState(false);
-  const [productBeingUpdated, setProductBeingUpdated] =
-    useState<Product | null>(null);
+const Creditors = () => {
   const dispatch = useAppDispatch();
-
+  const Data = useAppSelector((state) => state.sales.creditors);
+  const [OffLoadFuelModal, setOffLoadFuelModal] = useState(false);
   const [query, setQuery] = useState(''); // State to manage the search query
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,12 +29,14 @@ const ProductComponent = () => {
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof Product)[] = ['name', 'unit_price'];
+  const tableRow: (keyof Creditor)[] = [
+   
+  ];
   const customTitles = {
-    unit_price : 'Price'
+    
   };
 
-  const moneyFields: (keyof Product)[] = ['unit_price'];
+  const moneyFields: (keyof Creditor)[] = ['amount',];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
@@ -47,7 +46,7 @@ const ProductComponent = () => {
     let filtered = Data;
     if (query) {
       filtered = Data.filter((data) => {
-        return data;
+        return data
         // return data.company?.includes(query) || data.customer.includes(query);
       });
       // filtered = Data.filter((sale) => Data.date.includes(query));
@@ -60,25 +59,27 @@ const ProductComponent = () => {
 
     return currentData;
   };
-  const ModalComponent = () => (
-    <Modal
-      isOpen={productModal}
-      onClose={() => setproductModal(false)}
-      title="Add Tank"
-    >
-      {/* existingProduct={productBeingUpdated!} isEdit={productBeingUpdated ? true : false} */}
-      <ProductAddForm existingProduct={productBeingUpdated} isEdit={productBeingUpdated ? true : false}  onClose={() => setproductModal(false)} />
-    </Modal>
-  );
-  const newAction = (data: Product) => {
-    setProductBeingUpdated(data);
-    setproductModal(true);
-  };
 
-  const renderActions = (item: Product) => (
+  const newAction = (data : Creditor) => {
+
+  }
+  const deleteAction = (creditor : Creditor) => {
+
+  }
+
+  const renderActions = (item: Creditor) => (
     <div className="flex gap-4">
-      <button onClick={() => newAction(item)} className="">
-        <FontAwesomeIcon icon={faEdit} />
+      <button
+        onClick={() => newAction(item)}
+        className=""
+      >
+        <FontAwesomeIcon icon={faMoneyBill} />
+      </button>
+      <button
+        onClick={() => deleteAction(item)}
+        className=""
+      >
+        <FontAwesomeIcon color='red' icon={faTrash} />
       </button>
     </div>
   );
@@ -87,7 +88,6 @@ const ProductComponent = () => {
     <>
       <DefaultLayout>
         <Breadcrumb pageName="Creditors " />
-        <ModalComponent     />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
@@ -95,8 +95,7 @@ const ProductComponent = () => {
           moneyFields={moneyFields}
           renderActions={renderActions}
           filterData={filterData}
-          setNewEntryModal={setproductModal}
-          // newEntryModal={<ModalComponent />}
+          newEntryUrl="creditor/add"
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -110,4 +109,4 @@ const ProductComponent = () => {
   );
 };
 
-export default ProductComponent;
+export default Creditors;

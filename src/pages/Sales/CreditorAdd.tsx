@@ -48,7 +48,7 @@ const CreditorAdd = () => {
     setLoading(true);
     try {
       await dispatch(addCreditors(formData)).unwrap(); // Unwrap to catch the error
-      navigate('/stock');
+      navigate('/creditor');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
