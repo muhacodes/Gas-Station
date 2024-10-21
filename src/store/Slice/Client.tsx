@@ -4,25 +4,44 @@ import { GasStation, staff_type } from '../../types/client';
 import { handleAsyncThunk } from '../helpers/handleasyncthunk';
 import { fetchWithTokenRefresh } from '../helpers/appUtils';
 import { config } from '../../Config';
-import { ExpenseType } from '../../types/finance';
 
-interface ExpenseState {
-  expense: ExpenseType[];
+interface ClientState {
+  staff: staff_type[];
+  station: GasStation;
   loading: boolean;
   error: string | null;
 }
 
-const initialState: ExpenseState = {
-  expense: [],
+const initialState: ClientState = {
+  staff: [],
+  station: { created_at: '', id: '', location: '', name: '', tenant: null },
   error: null,
   loading: false,
 };
 
+export const fetchStaff = createAsyncThunk(
+  'staff/fetch',
+  async (_, thunkAPI) => {
+    const url = `${config.appUrl}/api/staff`;
+    try {
+      const response = await fetchWithTokenRefresh(url);
+      if (!response.ok) {
+        // If the response is not ok, throw an error with the response message
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      const data = await response.json();
+      return data; // This will be the action.payload for the fulfilled action
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
 
-export const addExpense = createAsyncThunk(
+export const AddStaff = createAsyncThunk(
   'staff/add',
-  async (postData: ExpenseType, thunkAPI) => {
-    const url = `${config.appUrl}/api/expenses`;
+  async (postData: staff_type, thunkAPI) => {
+    const url = `${config.appUrl}/api/staff`;
     try {
       const response = await fetchWithTokenRefresh(url, {
         method: 'POST',
@@ -45,10 +64,10 @@ export const addExpense = createAsyncThunk(
   },
 );
 
-export const getExpense = createAsyncThunk(
+export const GetStation = createAsyncThunk(
   'station/fetch',
   async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/expenses`;
+    const url = `${config.appUrl}/api/station/?email=${`admin@gmail.com`}`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -57,6 +76,7 @@ export const getExpense = createAsyncThunk(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
+      
       return data; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -64,29 +84,34 @@ export const getExpense = createAsyncThunk(
   },
 );
 
-export const ExpenseSlice = createSlice({
-  name: 'expense',
+export const ClientSlice = createSlice({
+  name: 'client',
   initialState,
   reducers: {
     // Implement additional reducers as needed
   },
   extraReducers: (builder) => {
     // Handle fetchProduct
-    handleAsyncThunk<ExpenseState, staff_type[], void>(builder, getExpense, {
-      dataKey: 'expense',
+    handleAsyncThunk<ClientState, staff_type[], void>(builder, fetchStaff, {
+      dataKey: 'staff',
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
-    handleAsyncThunk<ExpenseState, ExpenseType[], ExpenseType>(builder, addExpense, {
-      dataKey: 'expense',
+    handleAsyncThunk<ClientState, staff_type[], staff_type>(builder, AddStaff, {
+      dataKey: 'staff',
       errorKey: 'error',
       loadingKey: 'loading',
       append: true,
     });
 
+    handleAsyncThunk<ClientState, GasStation[], void>(builder, GetStation, {
+      dataKey: 'station',
+      errorKey: 'error',
+      loadingKey: 'loading',
+    });
   },
 });
 
-export const ClientActions = ExpenseSlice.actions;
-export default ExpenseSlice.reducer;
+export const ClientActions = ClientSlice.actions;
+export default ClientSlice.reducer;

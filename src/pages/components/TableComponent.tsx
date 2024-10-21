@@ -1,6 +1,6 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 type Option = {
@@ -18,11 +18,11 @@ type TableComponentProps<T> = {
   actions?: boolean;
   Pagination?: React.ReactNode; // Add pagination as a ReactNode
   renderActions?: (item: T) => React.ReactNode; // Add renderActions prop
-  filterData: (query: string) => void;
+  filterData?: (query: string) => void;
   filterDataBy?: string;
   newEntryUrl?: string;
-  newEntryModal?: React.ReactNode;
-  setProductModal?: (isOpen: boolean) => void;
+  setNewEntryModal?: (isOpen: boolean) => void;
+  ExtraOptions?: React.FC; // Define the prop as a React component
 };
 
 // Helper function to access nested properties safely
@@ -47,9 +47,25 @@ const TableComponent = <T extends object>({
   filterData,
   filterDataBy,
   newEntryUrl,
-  newEntryModal,
-  setProductModal,
+  setNewEntryModal: setProductModal,
+  ExtraOptions,
 }: TableComponentProps<T>) => {
+  const [visibleFields, setVisibleFields] =
+    useState<(keyof T | string)[]>(fields);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+
+    const toggleDropdown = () => {
+      setDropdownVisible(!dropdownVisible);
+    };
+
+  const handleFieldVisibilityChange = (field: keyof T | string) => {
+    setVisibleFields(
+      (prev) =>
+        prev.includes(field)
+          ? prev.filter((f) => f !== field) // Remove field if it's visible
+          : [...prev, field], // Add field if it's hidden
+    );
+  };
   return (
     <div className="w-full max-w-full py-2 ">
       {/* {error} */}
@@ -58,42 +74,69 @@ const TableComponent = <T extends object>({
           <div className="flex my-5 justify-between">
             <div className="w-90">
               {/* Whenever a user enters search here, filter the students based on firstname, lastname, dob */}
-              <input
-                type="text"
-                placeholder={`${
-                  filterDataBy ? filterDataBy : 'Filter By Date'
-                }`}
-                onChange={(e) => filterData(e.target.value)}
-                className="w-full p-4 text-gray-700 bg-transparent border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 ease-in-out"
-              />
+              {filterDataBy && (
+                <input
+                  type="text"
+                  placeholder={`${
+                    filterDataBy ? filterDataBy : 'Filter By Date'
+                  }`}
+                  onChange={(e) => filterData!(e.target.value)}
+                  className="w-full p-4 text-gray-700 bg-transparent border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 ease-in-out"
+                />
+              )}
             </div>
-            {!newEntryUrl ? (
-              <button
-                onClick={() => {
-                  setProductModal!(true)
-                }} // Call setProductModal to open the modal
-                className="flex bg-slate-700 text-white p-2 items-center gap-2"
-              >
-                New Entry <FontAwesomeIcon icon={faPlus} />
-              </button>
-            ) : (
-              <Link to={`/${newEntryUrl}`}>
-                <button className="flex bg-slate-700 text-white p-2 items-center gap-2">
+            <div className="flex items-center gap-4">
+              {!newEntryUrl ? (
+                <button
+                  onClick={() => {
+                    setProductModal!(true);
+                  }} // Call setProductModal to open the modal
+                  className="flex bg-slate-800 text-white p-2 items-center gap-2"
+                >
                   New Entry <FontAwesomeIcon icon={faPlus} />
                 </button>
-              </Link>
-            )}
-            {/* <Link to={`/${newEntryUrl}`}>
-              <button className="flex bg-slate-700 text-white p-2 items-center gap-2">
-                New Entry <FontAwesomeIcon icon={faPlus} />
-              </button>
-            </Link> */}
+              ) : (
+                <Link to={`/${newEntryUrl}`}>
+                  <button className="flex bg-slate-800 text-white p-2 items-center gap-2">
+                    New Entry <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                </Link>
+              )}
+              {ExtraOptions ? <ExtraOptions /> : <p></p>}
+              {/* <select className=''>
+                <div className='w-1/2 h-20 bg-red-400'></div>
+              </select> */}
+              {/* Button to toggle column hide/show options */}
+            
+
+              {/* Dropdown to toggle column visibility */}
+              {/* <div className="relative">
+                <button className="bg-gray-200 text-black p-2 rounded-lg">
+                  Hide Columns
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+                  {fields.map((field) => (
+                    <label key={String(field)} className="block mb-2">
+                      <input
+                        type="checkbox"
+                        checked={visibleFields.includes(field)}
+                        onChange={() => handleFieldVisibilityChange(field)}
+                        className="mr-2"
+                      />
+                      {customTitles[field as keyof T] ||
+                        String(field).charAt(0).toUpperCase() +
+                          String(field).slice(1)}
+                    </label>
+                  ))}
+                </div>
+              </div> */}
+            </div>
           </div>
           <table className="w-full table-auto">
             {/* Table Header */}
             <thead>
               <tr className="bg-slate-700 text-white text-left dark:bg-meta-4">
-                {fields.map((field) => (
+                {visibleFields.map((field) => (
                   <th
                     key={String(field)}
                     className="min-w-[50px] py-3 px-2 font-medium dark:text-white"
@@ -107,7 +150,7 @@ const TableComponent = <T extends object>({
                   <th className="min-w-[50px] py-3 px-2 font-medium dark:text-white">
                     Actions
                   </th>
-                )}{' '}
+                )}
                 {/* Render Actions column if provided */}
               </tr>
             </thead>
@@ -116,9 +159,8 @@ const TableComponent = <T extends object>({
             <tbody>
               {data.map((item, index) => (
                 <tr key={index}>
-                  {fields.map((field) => {
+                  {visibleFields.map((field) => {
                     const value = getValue(item, String(field));
-
                     if (typeof value === 'string' && isNumericString(value)) {
                       // Check if the field is in moneyFields to format as currency
                       if (moneyFields.includes(field)) {
@@ -136,8 +178,6 @@ const TableComponent = <T extends object>({
                           </td>
                         );
                       }
-
-                      // Otherwise, format as a general numeric value (e.g., liters)
                       return (
                         <td
                           key={String(field)}

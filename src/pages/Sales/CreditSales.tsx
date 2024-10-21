@@ -11,10 +11,18 @@ import Modal from '../../components/Modal';
 import TableHeader from '../components/tableHeader';
 import TableBody from '../components/tableBody';
 import { CreditSale } from '../../types/finance';
+import TableComponent from '../components/TableComponent';
+import Pagination from '../components/PaginationComponent';
 
 const CreditSales = () => {
   const [TankModal, setTankModal] = useState(false);
-  const CreditSales = useAppSelector((state) => state.sales.creditSales);
+  const Data = useAppSelector((state) => state.sales.creditSales);
+  const [query, setQuery] = useState(''); // State to manage the search query
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(Data.length / itemsPerPage);
+
 
   const allFields: (keyof CreditSale)[] = [
     'date',
@@ -32,7 +40,7 @@ const CreditSales = () => {
   const tableRow: (keyof CreditSale | string)[] = [
     'date',
     'product.name',
-    'creditor.company',
+    'creditor.customer',
     'litres',
     'unit_price',
     'discount',
@@ -45,45 +53,53 @@ const CreditSales = () => {
   const customTitles = {
     unit_price: 'Price',
     discount_amount: 'Discounted',
+    'creditor.customer' : 'Customer'
+  };
+
+  const moneyFields: (keyof CreditSale)[] = ['amount', 'discount', 'discount_amount'];
+  const filterData = (query: string) => {
+    setQuery(query); // Update search query state
+    setCurrentPage(1); // Reset to page 1 on new search
+  };
+  const getFilteredData = () => {
+    // Step 1: Filter sales based on the query
+    let filtered = Data;
+    if (query) {
+      filtered = Data.filter((data) => {
+        return data.creditor?.customer
+            ?.toLocaleLowerCase()
+            .includes(query.toLocaleLowerCase())
+      });
+      // filtered = Data.filter((sale) => Data.date.includes(query));
+    }
+
+    // Step 2: Apply pagination to the filtered data
+    const indexOfLastData = currentPage * itemsPerPage;
+    const indexOfFirstData = indexOfLastData - itemsPerPage;
+    const currentData = filtered.slice(indexOfFirstData, indexOfLastData);
+
+    return currentData;
   };
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Credit Sales " />
-
-        {/* <!-- ====== Calendar Section Start ====== --> */}
-        <div className="w-full max-w-full py-2 ">
-          {/* {error} */}
-          <div className="rounded-sm mt-10 border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-            <div className="max-w-full overflow-x-auto lg:overflow-">
-              <div className="flex my-5 justify-between">
-                <div className="w-90">
-                  {/* Whenever a user enters search here, filter the students based on firstname, lastname, dob */}
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full p-4 text-gray-700 bg-transparent border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 ease-in-out"
-                  />
-                </div>
-
-                <Link to="/credit/sales/add">
-                  <button className="flex bg-slate-700 text-white p-2 items-center gap-2">
-                    New Entry <FontAwesomeIcon icon={faPlus} />
-                  </button>
-                </Link>
-              </div>
-              <table className="w-full table-auto">
-                <TableHeader<CreditSale>
-                  customTitles={customTitles}
-                  fields={allFields}
-                />
-                <tbody>
-                  <TableBody data={CreditSales} fields={tableRow} />
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <Breadcrumb pageName="Creditors " />
+        <TableComponent
+          data={getFilteredData()}
+          fields={tableRow}
+          customTitles={customTitles}
+          moneyFields={moneyFields}
+          filterData={filterData}
+          newEntryUrl="credit/sales/add"
+          filterDataBy='company'
+          Pagination={
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
+          }
+        />
       </DefaultLayout>
     </>
   );

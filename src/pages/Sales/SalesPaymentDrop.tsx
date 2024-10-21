@@ -1,72 +1,79 @@
-import { useState } from 'react';
-import {useAppSelector } from '../../hooks/customHooks';
+import {useState } from 'react';
+import {useAppSelector} from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import Modal from '../../components/Modal';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
-import { TankDipping as TankDippingType } from '../../types/productType';
+import {payment_drop_type} from '../../types/sales';
+import DropAddModalForm from './SalesPaymentDropAdd';
 
-const TankDipping = () => {
-  const Data = useAppSelector((state) => state.tank.TankDipping);
+const SalesPaymentDrop = () => {
+  const [dropModa, setDropModal] = useState(false);
+  const Data = useAppSelector((state) => state.sales.drop);
   const [query, setQuery] = useState(''); // State to manage the search query
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof TankDippingType)[] = [
+  const tableRow: (keyof payment_drop_type | string)[] = [
     'date',
-    'Tank',
-    'opening',
-    'closing',
-    'expected_sales',
-    'metre_sales',
-    'variance',
+    'pump.name',
+    'shift',
+    'amount',
+    // 'supervisor',
+    // 'agent',
   ];
   const customTitles = {
-    expected_sales : 'Expected Sales',
-    metre_sales : 'Meter Sales',
-    'tank.name' : 'Tank',
+    date: 'Date',
+    'pump.name': 'Pump',
   };
 
-  const moneyFields: (keyof TankDippingType)[] = ['closing', 'expected_sales', 'metre_sales', ];
+  const moneyFields: (keyof payment_drop_type)[] = ['amount'];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
   };
-
   const getFilteredData = () => {
     // Step 1: Filter sales based on the query
     let filtered = Data;
     if (query) {
       filtered = Data.filter((data) => {
-        // return data.company?.toLocaleLowerCase?.includes(query) || data.customer.includes(query);
-        return data.date.includes(query.toLocaleLowerCase());
+        return data.date.includes(query) || data.pump?.name.toLocaleLowerCase().includes(query.toLocaleLowerCase())
       });
-      // filtered = Data.filter((sale) => Data.date.includes(query));
     }
-
-    // Step 2: Apply pagination to the filtered data
+    
     const indexOfLastData = currentPage * itemsPerPage;
     const indexOfFirstData = indexOfLastData - itemsPerPage;
     const currentData = filtered.slice(indexOfFirstData, indexOfLastData);
 
     return currentData;
-  }
-  
+  };
+
+  const ModalComponent = () => (
+    <Modal
+      isOpen={dropModa}
+      onClose={() => setDropModal(false)}
+      title="Add Drop Entry"
+    >
+     <DropAddModalForm  onClose={() => setDropModal(false)}/>
+    </Modal>
+  );
+
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Tank Dipping " />
+        <Breadcrumb pageName="Drop Add" />
+        <ModalComponent />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
+          setNewEntryModal={setDropModal}
           customTitles={customTitles}
           moneyFields={moneyFields}
           filterData={filterData}
-          newEntryUrl="tank-dipping-add"
-          filterDataBy="Date"
+          filterDataBy="date"
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -80,4 +87,4 @@ const TankDipping = () => {
   );
 };
 
-export default TankDipping;
+export default SalesPaymentDrop;

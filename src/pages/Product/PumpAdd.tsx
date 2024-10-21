@@ -6,6 +6,7 @@ import { Product, Pump, Tank as TankType } from '../../types/productType';
 import {
   addProduct,
   addPump,
+  fetchPump,
   updateProduct,
 } from '../../store/Slice/ProductSlice'; // Adjust your import for update
 import { addTank } from '../../store/Slice/Tank';
@@ -19,6 +20,7 @@ interface TankAddProps {
 const PumpAddForm: React.FC<TankAddProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const station = useAppSelector((state) => state.client.station);
   const [formData, setFormData] = useState<Pump>({
     station: '1',
     name: '',
@@ -40,6 +42,7 @@ const PumpAddForm: React.FC<TankAddProps> = ({ onClose }) => {
 
     try {
       await dispatch(addPump(formData)).unwrap();
+      await dispatch(fetchPump()).unwrap;
       onClose();
     } catch (error: any) {
       console.error('Failed to Add Tank:', error);

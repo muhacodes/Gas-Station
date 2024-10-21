@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addFuelDelivery } from '../../store/Slice/Tank';
+import { addFuelDelivery, fetchTank } from '../../store/Slice/Tank';
 import FormModalComponent from '../components/FormModal';
 import { fuelDelivery } from '../../types/productType';
 
@@ -69,6 +69,7 @@ const FuelDeliveryAdd: React.FC<FuelDeliveryProps> = ({ onClose }) => {
     try {
       console.log(data); // Should show stock as stock ID, not product name
       await dispatch(addFuelDelivery(data)).unwrap();
+      await dispatch(fetchTank()).unwrap();
       onClose();
     } catch (error) {
       console.error('Failed to Offload Fuel into Tank:', error);

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import PageTitle from './components/PageTitle';
 import ProtectedRoute from './pages/Authentication/ProtectedRoute';
@@ -25,23 +25,49 @@ import Fueldelivery from './pages/Tank/fueldelivery';
 import Pump from './pages/Product/Pump';
 import Creditors from './pages/Sales/Creditors';
 import CreditorAdd from './pages/Sales/CreditorAdd';
-import { fetchCreditors, fetchCreditSales, fetchSales } from './store/Slice/Sales';
+import {
+  fetchCreditors,
+  fetchCreditSales,
+  fetchDiscount,
+  fetchDrop,
+  fetchPumpSummary,
+  fetchSales,
+  fetchSalesPayment,
+} from './store/Slice/Sales';
 import Sales from './pages/Sales/sales';
 import SalesAdd from './pages/Sales/SalesAdd';
 import Meter from './pages/Tank/Meter';
 import CreditSales from './pages/Sales/CreditSales';
 import CreditSalesAdd from './pages/Sales/CreditSalesAdd';
+import DippingAdd from './pages/Tank/DippingAdd';
+import Discount from './pages/Sales/Discount';
+import DiscountAdd from './pages/Sales/DiscountAdd';
+import Loading from './components/Loading';
+import SalesPayment from './pages/Sales/SalesPayment';
+import SalesPaymentAdd from './pages/Sales/SalesPaymentAdd';
+import SalesPaymentDrop from './pages/Sales/SalesPaymentDrop';
+import PumpSalesSummary from './pages/Sales/PumpSaes';
+import Staff from './pages/Client/Staff';
+import { fetchStaff, GetStation } from './store/Slice/Client';
+import StaffAdd from './pages/Client/StaffAdd';
+import { getExpense } from './store/Slice/Expenses';
+import Expenses from './pages/Expenses/Expenses';
+import ExpenseAdd from './pages/Expenses/ExpensesAdd';
 
 // import Calendar from './pages/Calendar
 
 function App() {
   const auth = useAppSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const fetch = async () => {
+    setLoading(true);
     try {
       const startTime = performance.now(); // Start timer
+      await dispatch(GetStation()).unwrap();
       await Promise.all([
+        dispatch(getExpense()).unwrap(),
         dispatch(fetchProduct()).unwrap(),
         dispatch(fetchPump()).unwrap(),
         dispatch(fetchStock()).unwrap(),
@@ -52,15 +78,19 @@ function App() {
         dispatch(fetchDipping()).unwrap(),
         dispatch(fetchSales()).unwrap(),
         dispatch(fetchCreditSales()).unwrap(),
+        dispatch(fetchDiscount()).unwrap(),
+        dispatch(fetchSalesPayment()).unwrap(),
+        dispatch(fetchDrop()).unwrap(),
+        dispatch(fetchPumpSummary()).unwrap(),
+        dispatch(fetchStaff()).unwrap(),
       ]);
-
+      setLoading(false);
       const endTime = performance.now(); // End timer
       const duration = endTime - startTime; // Calculate the time difference
-
-      console.log('All Data fetched');
       console.log(`Fetching took ${duration.toFixed(2)} milliseconds.`);
     } catch (Error: any) {
       console.log('AppWide Fetching Error Occured!', Error);
+      setLoading(false);
     }
   };
 
@@ -70,6 +100,7 @@ function App() {
       // const parsedState = JSON.parse(persistedState);
     }
     fetch();
+    console.log(auth);
   }, []);
 
   useEffect(() => {
@@ -150,12 +181,24 @@ function App() {
         />
 
         <Route
-          path="/tank/dipping"
+          path="/tank-dipping"
           element={
             <ProtectedRoute>
               <>
                 <PageTitle title="Dipping" />
                 <Dipping />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tank-dipping-add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Dipping" />
+                <DippingAdd />
               </>
             </ProtectedRoute>
           }
@@ -196,6 +239,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/pump-summary"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Pump" />
+                <PumpSalesSummary />
+              </>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/creditor"
@@ -220,7 +274,6 @@ function App() {
           }
         />
 
-
         <Route
           path="/credit/sales"
           element={
@@ -244,8 +297,6 @@ function App() {
           }
         />
 
-        
-
         <Route
           path="/sales"
           element={
@@ -264,6 +315,133 @@ function App() {
               <>
                 <PageTitle title="Fuel Delivery" />
                 <SalesAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales-payment"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Sales Payment" />
+                <SalesPayment />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales-payment/add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Sales Payment | ADD" />
+                <SalesPaymentAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales-drop"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Drop" />
+                <SalesPaymentDrop />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/discount"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Fuel Delivery" />
+                <Discount />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/discount/add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Fuel Delivery" />
+                <DiscountAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/discount/add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Fuel Delivery" />
+                <SalesAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/staff"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Fuel Delivery" />
+                <Staff />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Fuel Delivery" />
+                <StaffAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/expenses"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Expenses" />
+                <Expenses />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/expenses/add"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Expenses/Add" />
+                <ExpenseAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Settings" />
+                <Home />
               </>
             </ProtectedRoute>
           }

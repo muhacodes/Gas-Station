@@ -197,7 +197,7 @@ export const ProductSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {
-    departmentAdded: (state, action: PayloadAction<Product>) => {
+    UpdateProduct: (state, action: PayloadAction<Product>) => {
       // console.log(action.payload);
       const productIndex = state.products.findIndex((product) => product.id === action.payload.id);
       state.products[productIndex].unit_price = action.payload.unit_price;

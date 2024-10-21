@@ -1,54 +1,62 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useState } from 'react';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEdit,
-  faEye,
+  faBook,
+  faMoneyBill,
+  faMoneyBillWaveAlt,
+  faPerson,
   faPlus,
+  faReceipt,
+  faRemove,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-
-import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import Modal from '../../components/Modal';
-import ProductAddForm from './ProductAdd';
-import { Product } from '../../types/productType';
 import TableComponent from '../components/TableComponent';
+import { Creditor } from '../../types/finance';
 import Pagination from '../components/PaginationComponent';
+import { ProductActions } from '../../store/Slice/ProductSlice';
+import { DeleteCreditors, fetchCreditSales } from '../../store/Slice/Sales';
+import { staff_type } from '../../types/client';
+import InviteUserForm from './InviteUser';
 
-const ProductComponent = () => {
-  const Data = useAppSelector((state) => state.product.products);
-  const [productModal, setproductModal] = useState(false);
-  const [productBeingUpdated, setProductBeingUpdated] =
-    useState<Product | null>(null);
+const Staff = () => {
   const dispatch = useAppDispatch();
-
+  const Data = useAppSelector((state) => state.client.staff);
+  const [inviteUserModal, setInviteUserModal] = useState(false);
   const [query, setQuery] = useState(''); // State to manage the search query
+  const [selectedStaff, setSelectedStaff] = useState<staff_type | null>(null);
 
+  const [deleteModal, setDeleteModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof Product)[] = ['name', 'unit_price'];
-  const customTitles = {
-    unit_price : 'Price'
-  };
+  const tableRow: (keyof staff_type)[] = ['name', 'designation', 'address'];
+  const customTitles = {};
 
-  const moneyFields: (keyof Product)[] = ['unit_price'];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
   };
+
   const getFilteredData = () => {
     // Step 1: Filter sales based on the query
     let filtered = Data;
     if (query) {
       filtered = Data.filter((data) => {
-        return data;
-        // return data.company?.includes(query) || data.customer.includes(query);
+        // return data.company?.toLocaleLowerCase?.includes(query) || data.customer.includes(query);
+        return (
+          data.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()) ||
+          (data.designation &&
+            data.designation
+              .toLocaleLowerCase()
+              .includes(query.toLocaleLowerCase()))
+        );
       });
       // filtered = Data.filter((sale) => Data.date.includes(query));
     }
@@ -60,43 +68,42 @@ const ProductComponent = () => {
 
     return currentData;
   };
+
   const ModalComponent = () => (
     <Modal
-      isOpen={productModal}
-      onClose={() => setproductModal(false)}
-      title="Add Tank"
+      isOpen={inviteUserModal}
+      onClose={() => setInviteUserModal(false)}
+      title="Invite User"
     >
-      {/* existingProduct={productBeingUpdated!} isEdit={productBeingUpdated ? true : false} */}
-      <ProductAddForm existingProduct={productBeingUpdated} isEdit={productBeingUpdated ? true : false}  onClose={() => setproductModal(false)} />
+     <InviteUserForm  onClose={() => setInviteUserModal(false)}/>
     </Modal>
   );
-  const newAction = (data: Product) => {
-    setProductBeingUpdated(data);
-    setproductModal(true);
-  };
 
-  const renderActions = (item: Product) => (
-    <div className="flex gap-4">
-      <button onClick={() => newAction(item)} className="">
-        <FontAwesomeIcon icon={faEdit} />
+
+  const InviteUser: React.FC = () => {
+    return (
+      <button
+        className="flex bg-slate-800 text-white p-2 items-center gap-2"
+        onClick={() => setInviteUserModal(true)}
+      >
+        <FontAwesomeIcon icon={faPerson} /> Invite User
       </button>
-    </div>
-  );
+    );
+  };
 
   return (
     <>
+      <ModalComponent />
       <DefaultLayout>
-        <Breadcrumb pageName="Creditors " />
-        <ModalComponent     />
+        <Breadcrumb pageName="Staff " />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
           customTitles={customTitles}
-          moneyFields={moneyFields}
-          renderActions={renderActions}
           filterData={filterData}
-          setNewEntryModal={setproductModal}
-          // newEntryModal={<ModalComponent />}
+          newEntryUrl="staff/add"
+          filterDataBy="name, designation"
+          ExtraOptions={InviteUser}
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -110,4 +117,4 @@ const ProductComponent = () => {
   );
 };
 
-export default ProductComponent;
+export default Staff;

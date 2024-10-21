@@ -1,23 +1,23 @@
-import {useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSpinner,
-} from '@fortawesome/free-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addCreditSales, fetchPumpSummary} from '../../store/Slice/Sales';
+import { addCreditSales } from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { CreditSale } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
+import { staff_type } from '../../types/client';
+import { AddStaff, fetchStaff } from '../../store/Slice/Client';
+import { showNotificationWithTimeout } from '../../store/Slice/Notification';
 
-const CreditSalesAdd = () => {
+const StaffAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const station = useAppSelector((state) => state.client.station);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
-  const meter = useAppSelector((state) => state.tank.Meter);
-  const creditor = useAppSelector((state) => state.sales.creditors);
 
   interface Option {
     value: string;
@@ -33,13 +33,14 @@ const CreditSalesAdd = () => {
     autocompleteOptions?: Option[];
   };
 
-  const handleSubmit = async (data: CreditSale) => {
+  const handleSubmit = async (data: staff_type) => {
     setLoading(true);
     try {
       console.log(data);
-      await dispatch(addCreditSales(data)).unwrap(); // Unwrap to catch the error
-      await dispatch(fetchPumpSummary()).unwrap()
-        navigate('/credit/sales');
+      await dispatch(AddStaff(data)).unwrap(); // Unwrap to catch the error
+       dispatch(showNotificationWithTimeout('Succesfully added staff ', 'success'))
+    //   await dispatch(fetchStaff()).unwrap();
+      navigate('/staff');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -57,76 +58,41 @@ const CreditSalesAdd = () => {
       setLoading(false);
     }
   };
-  const fields: FormField<CreditSale>[] = [
+  const fields: FormField<staff_type>[] = [
     {
-      name: 'date',
-      label: 'Date',
-      type: 'date',
-      //   required: true,
-    },
-    {
-      name: 'creditor',
-      label: 'creditor',
-      type: 'autocomplete',
-      //   required: true,
-      autocompleteOptions: creditor.map((value) => ({
-        value: value.id!,
-        label: `${value.company} - ${value.customer}`,
-      })),
-    },
-
-    {
-      name: 'litres',
-      label: 'Litres',
+      name: 'name',
+      label: 'Full Name',
       type: 'text',
       //   required: true,
     },
-
     {
-      name: 'Meter',
-      label: 'Meter',
-      type: 'select',
-      options: meter.map((tank) => ({
-        value: tank.id!,
-        label: tank.name,
-      })),
-    },
-
-    {
-      name: 'discount',
-      label: 'Discount - @',
+      name: 'designation',
+      label: 'Role',
       type: 'text',
-      //   required: true,
     },
 
     {
-      name: 'shift',
-      label: 'Shift',
-      type: 'select',
-      options: [{ Morning: 'Morning' }, { Evening: 'Evening' }].map(
-        (value) => ({
-          value: Object.values(value)[0],
-          label: Object.keys(value)[0],
-        }),
-      ),
+      name: 'address',
+      label: 'Address',
+      type: 'text',
       //   required: true,
     },
   ];
 
   return (
     <DefaultLayout>
-      {loading && (
+      {/* {loading && (
         <div className="fixed inset-0 z-40 bg-black bg-opacity-25 flex justify-center items-center">
           <FontAwesomeIcon className="text-1xl" spin={true} icon={faSpinner} />
         </div>
-      )}
+      )} */}
       <div className="mx-auto">
-        <Breadcrumb pageName="Credit Sales  / Add " />
-        <FormContainerComponent<CreditSale>
+        <Breadcrumb pageName="Staff Add " />
+        <FormContainerComponent<staff_type>
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
-          initialValues={{ station: '1',}}
+          initialValues={{ station: station.id }}
           error={error}
           setError={setError}
         />
@@ -135,4 +101,4 @@ const CreditSalesAdd = () => {
   );
 };
 
-export default CreditSalesAdd;
+export default StaffAdd;

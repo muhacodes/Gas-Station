@@ -12,7 +12,9 @@ import AuthSlice from './Slice/Auth';
 import ProductSlice from './Slice/ProductSlice';
 import TankSlice  from './Slice/Tank';
 import SalesSlice  from './Slice/Sales';
-
+import ClientSlice  from './Slice/Client';
+import notificationSlice from './Slice/Notification' 
+import  ExpenseSlice  from './Slice/Expenses';
 
 
 
@@ -29,7 +31,9 @@ const rootReducer = combineReducers({
   product : ProductSlice,
   tank : TankSlice,
   sales: SalesSlice,
-  
+  client : ClientSlice,
+  notification : notificationSlice,
+  expenses : ExpenseSlice,
 });
 
 // Wrap the rootReducer with persistReducer using the persistConfig

@@ -1,23 +1,23 @@
-import {useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSpinner,
-} from '@fortawesome/free-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addCreditSales, fetchPumpSummary} from '../../store/Slice/Sales';
+import { addDiscount, fetchDiscount, fetchPumpSummary } from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { CreditSale } from '../../types/finance';
+import { Discount } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
+import { prod } from 'mathjs';
 
-const CreditSalesAdd = () => {
+const DiscountAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
   const meter = useAppSelector((state) => state.tank.Meter);
-  const creditor = useAppSelector((state) => state.sales.creditors);
+  const product = useAppSelector((state) => state.product.products);
+  const pump = useAppSelector((state) => state.product.pump);
 
   interface Option {
     value: string;
@@ -33,13 +33,14 @@ const CreditSalesAdd = () => {
     autocompleteOptions?: Option[];
   };
 
-  const handleSubmit = async (data: CreditSale) => {
+  const handleSubmit = async (data: Discount) => {
     setLoading(true);
     try {
       console.log(data);
-      await dispatch(addCreditSales(data)).unwrap(); // Unwrap to catch the error
+      await dispatch(addDiscount(data)).unwrap(); // Unwrap to catch the error
+      await dispatch(fetchDiscount()).unwrap(); // Unwrap to catch the error
       await dispatch(fetchPumpSummary()).unwrap()
-        navigate('/credit/sales');
+      navigate('/discount');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -57,7 +58,7 @@ const CreditSalesAdd = () => {
       setLoading(false);
     }
   };
-  const fields: FormField<CreditSale>[] = [
+  const fields: FormField<Discount>[] = [
     {
       name: 'date',
       label: 'Date',
@@ -65,14 +66,50 @@ const CreditSalesAdd = () => {
       //   required: true,
     },
     {
-      name: 'creditor',
-      label: 'creditor',
+      name: 'meter',
+      label: 'Meter',
       type: 'autocomplete',
       //   required: true,
-      autocompleteOptions: creditor.map((value) => ({
+      autocompleteOptions: meter.map((value) => ({
         value: value.id!,
-        label: `${value.company} - ${value.customer}`,
+        label: value.name,
       })),
+    },
+
+    {
+      name: 'product',
+      label: 'Product',
+      type: 'select',
+      required: true,
+      options: product.map((tank) => ({
+        value: tank.id!,
+        label: tank.name,
+      })),
+    },
+
+    {
+      name: 'pump',
+      label: 'Pump',
+      type: 'select',
+      required: true,
+      options: pump.map((tank) => ({
+        value: tank.id!,
+        label: tank.name,
+      })),
+      //   required: true,
+    },
+    {
+      name: 'customer',
+      label: 'Customer',
+      type: 'text',
+      //   required: true,
+    },
+
+    {
+      name: 'amount',
+      label: 'Amount',
+      type: 'text',
+      //   required: true,
     },
 
     {
@@ -81,24 +118,7 @@ const CreditSalesAdd = () => {
       type: 'text',
       //   required: true,
     },
-
-    {
-      name: 'Meter',
-      label: 'Meter',
-      type: 'select',
-      options: meter.map((tank) => ({
-        value: tank.id!,
-        label: tank.name,
-      })),
-    },
-
-    {
-      name: 'discount',
-      label: 'Discount - @',
-      type: 'text',
-      //   required: true,
-    },
-
+    
     {
       name: 'shift',
       label: 'Shift',
@@ -121,12 +141,12 @@ const CreditSalesAdd = () => {
         </div>
       )}
       <div className="mx-auto">
-        <Breadcrumb pageName="Credit Sales  / Add " />
-        <FormContainerComponent<CreditSale>
+        <Breadcrumb pageName="Discount / Add " />
+        <FormContainerComponent<Discount>
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
-          initialValues={{ station: '1',}}
+          initialValues={{ station: '1' }}
           error={error}
           setError={setError}
         />
@@ -135,4 +155,4 @@ const CreditSalesAdd = () => {
   );
 };
 
-export default CreditSalesAdd;
+export default DiscountAdd;

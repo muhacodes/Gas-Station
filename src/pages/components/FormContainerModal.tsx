@@ -5,7 +5,7 @@ import { useState } from 'react';
 import AutocompleteInput from './AutoCompleteInputModal';
 import { CreditSale } from '../../types/finance';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 // interface FormProps {
 //   fields: FormField[];
@@ -148,7 +148,7 @@ interface FormProps<T> {
 //   onSubmit,
 //   loading,
 // }) => {
-const FormContainerComponent = <T extends {}>({
+const FormContainerModalComponent = <T extends {}>({
   fields,
   onSubmit,
   loading,
@@ -195,13 +195,8 @@ const FormContainerComponent = <T extends {}>({
   return (
     <form className="" onSubmit={handleSubmit}>
       <div className="grid grid-cols-4 gap-8">
-        <div className="col-span-5 xl:col-span-3">
+        <div className="col-span-12">
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                New Entry
-              </h3>
-            </div>
             <div className="p-7">
               <div
                 className={` ${
@@ -229,7 +224,7 @@ const FormContainerComponent = <T extends {}>({
                   icon={faTimes}
                 />
               </div>
-              <div className="mb-5.5 grid gap-x-10 gap-y-5 grid-cols-1 md:grid-cols-2">
+              <div className="mb-5.5 grid gap-x-10 gap-y-5 grid-cols-1">
                 {fields.map((field) => {
                   switch (field.type) {
                     // ... (other cases)
@@ -352,7 +347,7 @@ const FormContainerComponent = <T extends {}>({
                   className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
                   type="submit"
                 >
-                  {loading ? <FontAwesomeIcon spin={true} icon={faSpinner} /> : 'Save'}
+                  Save
                 </button>
               </div>
             </div>
@@ -363,4 +358,4 @@ const FormContainerComponent = <T extends {}>({
   );
 };
 
-export default FormContainerComponent;
+export default FormContainerModalComponent;

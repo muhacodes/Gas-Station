@@ -38,7 +38,7 @@ const SignIn: React.FC = () => {
 
       console.log(data);
       dispatch(AuthActions.addAuth(data));
-      navigate('/');
+      navigate('/home');
 
       setLoading(false);
     } catch (error: any) {

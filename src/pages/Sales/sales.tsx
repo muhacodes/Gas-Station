@@ -23,17 +23,17 @@ const Sales = () => {
     'date',
     'product.name',
     'shift',
-    'Meter',
+    'Meter.name',
     'opening',
     'closing',
     'litres',
-    'rtt_litres',
+    // 'rtt_litres',
     'rtt_amount',
     'unit_price',
     'amount',
     'cash',
     'difference',
-    'credit',
+    // 'credit',
     'creditamount',
     'agent',
   ];
@@ -45,10 +45,12 @@ const Sales = () => {
     difference: 'Short',
     'product.name': 'Product',
   };
-  const moneyFields: (keyof sales | string)[] = [
+  const moneyFields: (keyof sales)[] = [
     'amount',
     'creditamount',
     'unit_price',
+    'difference',
+    'cash',
   ]; // Money-related fields
 
   const handleEdit = (record: sales) => {
@@ -72,7 +74,17 @@ const Sales = () => {
     // Step 1: Filter sales based on the query
     let filtered = Data;
     if (query) {
-      filtered = Data.filter((sale) => sale.date.includes(query));
+      filtered = Data.filter((data) => {
+        return (
+          data.date.includes(query) ||
+          data.Meter?.pump?.name
+            .toLocaleLowerCase()
+            .includes(query.toLocaleLowerCase()) ||
+          data.Meter?.name
+            .toLocaleLowerCase()
+            .includes(query.toLocaleLowerCase())
+        );
+      });
     }
 
     // Step 2: Apply pagination to the filtered data
@@ -103,7 +115,7 @@ const Sales = () => {
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Creditors " />
+        <Breadcrumb pageName="Sales " />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
@@ -111,6 +123,7 @@ const Sales = () => {
           moneyFields={moneyFields}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          filterDataBy="Date, Pump, Meter"
           // renderActions={renderActions}
           filterData={filterData}
           newEntryUrl="sales/add"
