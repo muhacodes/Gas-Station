@@ -77,7 +77,7 @@ export const GetStation = createAsyncThunk(
       }
       const data = await response.json();
       
-      return data; // This will be the action.payload for the fulfilled action
+      return data[0]; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
     }

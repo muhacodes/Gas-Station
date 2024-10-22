@@ -14,29 +14,28 @@ const processPendingRequests = (newAccessToken: string): void => {
 
 export const fetchWithTokenRefresh = async (
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> => {
-
-  if(!url.endsWith('/') && url.includes('?') === false){
-    url+='/';
+  if (!url.endsWith('/') && url.includes('?') === false) {
+    url += '/';
   }
 
   // if(!url.endsWith('/')){
-    
+
   // }
-  
+
   // const navigate = useNavigate();
-  const { auth } = store.getState(); // Assuming this gives you AuthState
+  const { auth, client } = store.getState(); // Assuming this gives you AuthState
   let access = auth.access; // Access the access token from auth.list
 
-  
+  const StationId = client.station.id;
   const attemptRequest = async (token: string): Promise<Response> => {
     const response = await fetch(url, {
       ...options,
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
-        'X-Station-ID' : '1',
+        'X-Station-ID': StationId,
       },
     });
 

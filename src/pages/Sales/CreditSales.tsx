@@ -23,7 +23,6 @@ const CreditSales = () => {
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-
   const allFields: (keyof CreditSale)[] = [
     'date',
     'product',
@@ -53,10 +52,15 @@ const CreditSales = () => {
   const customTitles = {
     unit_price: 'Price',
     discount_amount: 'Discounted',
-    'creditor.customer' : 'Customer'
+    'creditor.customer': 'Customer',
+    'Meter.name': 'Meter',
   };
 
-  const moneyFields: (keyof CreditSale)[] = ['amount', 'discount', 'discount_amount'];
+  const moneyFields: (keyof CreditSale)[] = [
+    'amount',
+    'discount',
+    'discount_amount',
+  ];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
     setCurrentPage(1); // Reset to page 1 on new search
@@ -67,8 +71,8 @@ const CreditSales = () => {
     if (query) {
       filtered = Data.filter((data) => {
         return data.creditor?.customer
-            ?.toLocaleLowerCase()
-            .includes(query.toLocaleLowerCase())
+          ?.toLocaleLowerCase()
+          .includes(query.toLocaleLowerCase());
       });
       // filtered = Data.filter((sale) => Data.date.includes(query));
     }
@@ -91,7 +95,7 @@ const CreditSales = () => {
           moneyFields={moneyFields}
           filterData={filterData}
           newEntryUrl="credit/sales/add"
-          filterDataBy='company'
+          filterDataBy="company"
           Pagination={
             <Pagination
               currentPage={currentPage}

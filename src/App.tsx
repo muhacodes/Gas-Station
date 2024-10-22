@@ -66,8 +66,8 @@ function App() {
     try {
       const startTime = performance.now(); // Start timer
       await dispatch(GetStation()).unwrap();
-      await Promise.all([
-        dispatch(getExpense()).unwrap(),
+      
+      await Promise.all([        
         dispatch(fetchProduct()).unwrap(),
         dispatch(fetchPump()).unwrap(),
         dispatch(fetchStock()).unwrap(),
@@ -83,6 +83,7 @@ function App() {
         dispatch(fetchDrop()).unwrap(),
         dispatch(fetchPumpSummary()).unwrap(),
         dispatch(fetchStaff()).unwrap(),
+        dispatch(getExpense()).unwrap(),
       ]);
       setLoading(false);
       const endTime = performance.now(); // End timer

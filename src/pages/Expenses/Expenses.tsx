@@ -16,7 +16,7 @@ import Pagination from '../components/PaginationComponent';
 
 const Expenses = () => {
   const [ExpenseModal, setExpenseModal] = useState(false);
-  const Data = useAppSelector((state) => state.expenses.expense);
+  const Data = useAppSelector((state) => state.expenses.expenses);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;

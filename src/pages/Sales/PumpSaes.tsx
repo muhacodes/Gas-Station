@@ -36,6 +36,7 @@ const PumpSalesSummary = () => {
     total_sales_payment: 'Other Payments',
     total_drop: 'Drop',
     total_expenses: 'expenses',
+    'total_credit'  : 'Total Credit'
   };
   const moneyFields: (keyof pump_sales_type)[] = [
     'total_drop',

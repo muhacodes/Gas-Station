@@ -44,6 +44,7 @@ const Sales = () => {
     unit_price: 'Price',
     difference: 'Short',
     'product.name': 'Product',
+    'Meter.name' : 'Meter'
   };
   const moneyFields: (keyof sales)[] = [
     'amount',

@@ -35,6 +35,7 @@ const FuelDelivery = () => {
     'tank.name': 'Tank',
     'stock.cost_price': 'Cost Price',
     litres_remaining: 'Left',
+    'stock.company' : 'Company'
   };
 
   const moneyFields: (keyof fuelDelivery | string)[] = [

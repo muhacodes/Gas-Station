@@ -1,19 +1,17 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthUser, userType } from '../../types/auth';
-import { GasStation, staff_type } from '../../types/client';
 import { handleAsyncThunk } from '../helpers/handleasyncthunk';
 import { fetchWithTokenRefresh } from '../helpers/appUtils';
 import { config } from '../../Config';
 import { ExpenseType } from '../../types/finance';
 
 interface ExpenseState {
-  expense: ExpenseType[];
+  expenses: ExpenseType[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ExpenseState = {
-  expense: [],
+  expenses: [],
   error: null,
   loading: false,
 };
@@ -46,7 +44,7 @@ export const addExpense = createAsyncThunk(
 );
 
 export const getExpense = createAsyncThunk(
-  'station/fetch',
+  'expense/fetch',
   async (_, thunkAPI) => {
     const url = `${config.appUrl}/api/expenses`;
     try {
@@ -72,14 +70,14 @@ export const ExpenseSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Handle fetchProduct
-    handleAsyncThunk<ExpenseState, staff_type[], void>(builder, getExpense, {
-      dataKey: 'expense',
+    handleAsyncThunk<ExpenseState, ExpenseType[], void>(builder, getExpense, {
+      dataKey: 'expenses',
       errorKey: 'error',
       loadingKey: 'loading',
     });
 
     handleAsyncThunk<ExpenseState, ExpenseType[], ExpenseType>(builder, addExpense, {
-      dataKey: 'expense',
+      dataKey: 'expenses',
       errorKey: 'error',
       loadingKey: 'loading',
       append: true,
