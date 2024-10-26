@@ -17,17 +17,19 @@ import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import { useNavigate } from 'react-router-dom';
 import { addStock } from '../../store/Slice/ProductSlice';
 import { Stock } from '../../types/productType';
+import { showNotificationWithTimeout } from '../../store/Slice/Notification';
 
 const StockAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const product = useAppSelector((state) => state.product);
+  const station = useAppSelector((state) => state.client.GasStation);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
 
   const [formData, setFormData] = useState<Stock>({
     product: null,
-    station: '1',
+    station: station.id!,
     company: '',
     price: '',
     date: '',
@@ -53,9 +55,8 @@ const StockAdd = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log(formData);
-      const result = await dispatch(addStock(formData)).unwrap(); // Unwrap to catch the error
-      console.log('Stock Added Succesfully');
+      await dispatch(addStock(formData)).unwrap(); // Unwrap to catch the error
+      dispatch(showNotificationWithTimeout('Succesfully added stock', 'success'))
       navigate('/stock');
     } catch (error: any) {
       // The error object here is the thrown responseData object

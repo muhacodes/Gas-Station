@@ -19,13 +19,13 @@ const ProductAddForm: React.FC<ProductAddProps> = ({
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   // const station = useAppSelector((state) => state.product.products)[0];
-  const station = useAppSelector((state) => state.client.station);
+  const station = useAppSelector((state) => state.client.GasStation);
   
   const [error, setError] = useState<any>({});
   const [product, setProduct] = useState<Product>({
     id: '',
     name: '',
-    station: '1',
+    station: station.id!,
     unit_price: '',
   });
 
@@ -49,9 +49,7 @@ const ProductAddForm: React.FC<ProductAddProps> = ({
     e.preventDefault();
     setLoading(true);
 
-    console.log("station is ", station.id);
-    try { 
-      
+    try {       
       if (isEdit) {
         // Only update unit price
         await dispatch(updateProduct(product!)).unwrap();

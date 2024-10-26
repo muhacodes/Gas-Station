@@ -5,19 +5,20 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addCreditSales, fetchPumpSummary} from '../../store/Slice/Sales';
+import {fetchPumpSummary} from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { CreditSale, ExpenseType } from '../../types/finance';
+import {ExpenseType } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
 import { addExpense } from '../../store/Slice/Expenses';
+import { showNotificationWithTimeout } from '../../store/Slice/Notification';
 
 const ExpenseAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
-  const meter = useAppSelector((state) => state.tank.Meter);
+  const station = useAppSelector((state) => state.client.GasStation);
   const pump = useAppSelector((state) => state.product.pump);
 
   interface Option {
@@ -40,7 +41,8 @@ const ExpenseAdd = () => {
       console.log(data);
       await dispatch(addExpense(data)).unwrap(); // Unwrap to catch the error
       await dispatch(fetchPumpSummary()).unwrap()
-        navigate('/expenses');
+      dispatch(showNotificationWithTimeout('Succesfully added expenses', 'success'))
+      navigate('/expenses');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -127,7 +129,7 @@ const ExpenseAdd = () => {
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
-          initialValues={{ station: '1',}}
+          initialValues={{ station: station.id,}}
           error={error}
           setError={setError}
         />

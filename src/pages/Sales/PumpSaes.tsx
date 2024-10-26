@@ -73,11 +73,12 @@ const PumpSalesSummary = () => {
 
     return currentData;
   };
+  
 
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Pump Summary" />
+        <Breadcrumb pageName="OverView" />
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
@@ -85,6 +86,7 @@ const PumpSalesSummary = () => {
           moneyFields={moneyFields}
           filterDataBy="Date, Shift, Pump"
           filterData={filterData}
+          tableHeading='Pump Summary'
           Pagination={
             <Pagination
               currentPage={currentPage}

@@ -55,15 +55,18 @@ export const showNotificationWithTimeout = (
 ) => {
   return (dispatch: Dispatch) => {
     // Show the notification
-    dispatch(showNotification({ message, type }));
+    
 
+    setTimeout(() => {
+      dispatch(showNotification({ message, type }));
+    }, 500);
     // Trigger the fade-out effect after 4 seconds
     setTimeout(() => {
       dispatch(triggerFadeOut());
-    }, 4000); // Start fade-out after 4 seconds
+    }, 5000); // Start fade-out after 4 seconds
 
     setTimeout(() => {
       dispatch(hideNotification());
-    }, 5000);
+    }, 6000);
   };
 };

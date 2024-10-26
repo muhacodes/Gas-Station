@@ -7,14 +7,14 @@ import { config } from '../../Config';
 
 interface ClientState {
   staff: staff_type[];
-  station: GasStation;
+  GasStation: GasStation;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ClientState = {
   staff: [],
-  station: { created_at: '', id: '', location: '', name: '', tenant: null },
+  GasStation: { created_at: '', id: '', location: '', name: '', tenant: null },
   error: null,
   loading: false,
 };
@@ -65,7 +65,7 @@ export const AddStaff = createAsyncThunk(
 );
 
 export const GetStation = createAsyncThunk(
-  'station/fetch',
+  'getStation/fetch',
   async (_, thunkAPI) => {
     const url = `${config.appUrl}/api/station/?email=${`admin@gmail.com`}`;
     try {
@@ -76,7 +76,7 @@ export const GetStation = createAsyncThunk(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
-      
+      console.log("Gas Station Data is ", data[0])
       return data[0]; // This will be the action.payload for the fulfilled action
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -106,7 +106,7 @@ export const ClientSlice = createSlice({
     });
 
     handleAsyncThunk<ClientState, GasStation[], void>(builder, GetStation, {
-      dataKey: 'station',
+      dataKey: 'GasStation',
       errorKey: 'error',
       loadingKey: 'loading',
     });

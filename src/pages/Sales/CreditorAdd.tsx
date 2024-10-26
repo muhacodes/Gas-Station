@@ -11,19 +11,21 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Creditor } from '../../types/finance';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../hooks/customHooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import { addCreditors } from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import { showNotificationWithTimeout } from '../../store/Slice/Notification';
 
 const CreditorAdd = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
+  const station = useAppSelector((state) => state.client.GasStation);
 
   const [formData, setFormData] = useState<Creditor>({
-    station : '1',
+    station : station.id,
     customer: '',
     address: '',
     company: '',
@@ -48,6 +50,7 @@ const CreditorAdd = () => {
     setLoading(true);
     try {
       await dispatch(addCreditors(formData)).unwrap(); // Unwrap to catch the error
+      dispatch(showNotificationWithTimeout('Succesfully added Creditor', 'success'))
       navigate('/creditor');
     } catch (error: any) {
       // The error object here is the thrown responseData object

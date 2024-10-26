@@ -18,6 +18,7 @@ const DiscountAdd = () => {
   const meter = useAppSelector((state) => state.tank.Meter);
   const product = useAppSelector((state) => state.product.products);
   const pump = useAppSelector((state) => state.product.pump);
+  const station = useAppSelector((state) => state.client.GasStation);
 
   interface Option {
     value: string;
@@ -146,7 +147,7 @@ const DiscountAdd = () => {
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
-          initialValues={{ station: '1' }}
+          initialValues={{ station: station.id }}
           error={error}
           setError={setError}
         />

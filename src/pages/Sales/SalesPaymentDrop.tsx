@@ -1,5 +1,5 @@
-import {useState } from 'react';
-import {useAppSelector} from '../../hooks/customHooks';
+import {useEffect, useState } from 'react';
+import {useAppDispatch, useAppSelector} from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import Modal from '../../components/Modal';
@@ -7,13 +7,15 @@ import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
 import {payment_drop_type} from '../../types/sales';
 import DropAddModalForm from './SalesPaymentDropAdd';
+import { fetchDrop } from '../../store/Slice/Sales';
 
 const SalesPaymentDrop = () => {
   const [dropModa, setDropModal] = useState(false);
   const Data = useAppSelector((state) => state.sales.drop);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
+  const dispatch = useAppDispatch();
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
@@ -60,6 +62,14 @@ const SalesPaymentDrop = () => {
      <DropAddModalForm  onClose={() => setDropModal(false)}/>
     </Modal>
   );
+
+  // const fetch = async() => {
+  //   const result = await dispatch(fetchDrop())
+  //   console.log(result.payload);
+  // }
+  // useEffect(() => {
+  //   fetch();
+  // }, [])
 
   return (
     <>

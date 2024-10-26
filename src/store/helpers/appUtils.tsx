@@ -28,7 +28,7 @@ export const fetchWithTokenRefresh = async (
   const { auth, client } = store.getState(); // Assuming this gives you AuthState
   let access = auth.access; // Access the access token from auth.list
 
-  const StationId = client.station.id;
+  const StationId = client.GasStation.id!;
   const attemptRequest = async (token: string): Promise<Response> => {
     const response = await fetch(url, {
       ...options,

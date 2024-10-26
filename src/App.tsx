@@ -53,6 +53,7 @@ import StaffAdd from './pages/Client/StaffAdd';
 import { getExpense } from './store/Slice/Expenses';
 import Expenses from './pages/Expenses/Expenses';
 import ExpenseAdd from './pages/Expenses/ExpensesAdd';
+import UploadData from './pages/Client/UploadData';
 
 // import Calendar from './pages/Calendar
 
@@ -66,8 +67,7 @@ function App() {
     try {
       const startTime = performance.now(); // Start timer
       await dispatch(GetStation()).unwrap();
-      
-      await Promise.all([        
+      await Promise.all([
         dispatch(fetchProduct()).unwrap(),
         dispatch(fetchPump()).unwrap(),
         dispatch(fetchStock()).unwrap(),
@@ -436,6 +436,19 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Upload Data" />
+                <UploadData />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/settings"
           element={

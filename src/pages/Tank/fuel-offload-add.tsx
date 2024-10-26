@@ -27,6 +27,7 @@ const FuelDeliveryAdd: React.FC<FuelDeliveryProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const stocks = useAppSelector((state) => state.product.stocks);
   const tanks = useAppSelector((state) => state.tank.Tank);
+  const station = useAppSelector((state) => state.client.GasStation);
 
   interface FuelDeliveryFormData {
     date: string;
@@ -86,7 +87,7 @@ const FuelDeliveryAdd: React.FC<FuelDeliveryProps> = ({ onClose }) => {
       fields={fields}
       onSubmit={onSubmit}
       loading={loading}
-      initialValues={{ station: '1' }}
+      initialValues={{ station: station.id }}
     />
   );
 };

@@ -10,6 +10,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { CreditSale } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
+import { showNotificationWithTimeout } from '../../store/Slice/Notification';
 
 const CreditSalesAdd = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ const CreditSalesAdd = () => {
   const [error, setError] = useState<Record<string, string[]>>({});
   const meter = useAppSelector((state) => state.tank.Meter);
   const creditor = useAppSelector((state) => state.sales.creditors);
+  const station = useAppSelector((state) => state.client.GasStation);
 
   interface Option {
     value: string;
@@ -39,7 +41,9 @@ const CreditSalesAdd = () => {
       console.log(data);
       await dispatch(addCreditSales(data)).unwrap(); // Unwrap to catch the error
       await dispatch(fetchPumpSummary()).unwrap()
-        navigate('/credit/sales');
+      dispatch(showNotificationWithTimeout('Succesfully added Credit Sales, Creditor amount has been updated!!', 'success'))
+      // dispatch(showNotificationWithTimeout('Creditor Amount has been updated', 'info'))
+      navigate('/credit/sales');
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -126,7 +130,7 @@ const CreditSalesAdd = () => {
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}
-          initialValues={{ station: '1',}}
+          initialValues={{ station: station.id,}}
           error={error}
           setError={setError}
         />

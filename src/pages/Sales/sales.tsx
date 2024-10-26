@@ -15,7 +15,7 @@ const Sales = () => {
   const Data = useAppSelector((state) => state.sales.sales);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
@@ -27,32 +27,16 @@ const Sales = () => {
     'opening',
     'closing',
     'litres',
-    // 'rtt_litres',
-    'rtt_amount',
     'unit_price',
     'amount',
-    'cash',
-    'difference',
-    // 'credit',
-    'creditamount',
     'agent',
   ];
   const customTitles = {
-    rtt_litres: 'Rtt Litres',
-    rtt_amount: 'Rtt Amount',
-    creditamount: 'Credit Amount',
     unit_price: 'Price',
-    difference: 'Short',
     'product.name': 'Product',
-    'Meter.name' : 'Meter'
+    'Meter.name': 'Meter',
   };
-  const moneyFields: (keyof sales)[] = [
-    'amount',
-    'creditamount',
-    'unit_price',
-    'difference',
-    'cash',
-  ]; // Money-related fields
+  const moneyFields: (keyof sales)[] = ['amount', 'unit_price']; // Money-related fields
 
   const handleEdit = (record: sales) => {
     console.log('Edit record', record);

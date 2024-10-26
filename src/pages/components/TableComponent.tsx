@@ -23,6 +23,7 @@ type TableComponentProps<T> = {
   newEntryUrl?: string;
   setNewEntryModal?: (isOpen: boolean) => void;
   ExtraOptions?: React.FC; // Define the prop as a React component
+  tableHeading?: string,
 };
 
 // Helper function to access nested properties safely
@@ -49,6 +50,7 @@ const TableComponent = <T extends object>({
   newEntryUrl,
   setNewEntryModal: setProductModal,
   ExtraOptions,
+  tableHeading
 }: TableComponentProps<T>) => {
   const [visibleFields, setVisibleFields] =
     useState<(keyof T | string)[]>(fields);
@@ -71,6 +73,7 @@ const TableComponent = <T extends object>({
       {/* {error} */}
       <div className="rounded-sm mt-10 border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
         <div className="max-w-full overflow-x-auto lg:overflow-">
+          {tableHeading ? <strong> {tableHeading} </strong> : ''}
           <div className="flex my-5 justify-between">
             <div className="w-90">
               {/* Whenever a user enters search here, filter the students based on firstname, lastname, dob */}
@@ -103,33 +106,7 @@ const TableComponent = <T extends object>({
                 </Link>
               )}
               {ExtraOptions ? <ExtraOptions /> : <p></p>}
-              {/* <select className=''>
-                <div className='w-1/2 h-20 bg-red-400'></div>
-              </select> */}
-              {/* Button to toggle column hide/show options */}
-            
-
-              {/* Dropdown to toggle column visibility */}
-              {/* <div className="relative">
-                <button className="bg-gray-200 text-black p-2 rounded-lg">
-                  Hide Columns
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-                  {fields.map((field) => (
-                    <label key={String(field)} className="block mb-2">
-                      <input
-                        type="checkbox"
-                        checked={visibleFields.includes(field)}
-                        onChange={() => handleFieldVisibilityChange(field)}
-                        className="mr-2"
-                      />
-                      {customTitles[field as keyof T] ||
-                        String(field).charAt(0).toUpperCase() +
-                          String(field).slice(1)}
-                    </label>
-                  ))}
-                </div>
-              </div> */}
+              
             </div>
           </div>
           <table className="w-full table-auto">
@@ -158,7 +135,7 @@ const TableComponent = <T extends object>({
             {/* Table Body */}
             <tbody>
               {data.map((item, index) => (
-                <tr key={index}>
+                <tr className='hover:bg-slate-200 dark:hover:bg-slate-700' key={index}>
                   {visibleFields.map((field) => {
                     const value = getValue(item, String(field));
                     if (typeof value === 'string' && isNumericString(value)) {

@@ -1,41 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
+import {useState } from 'react';
+import { useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { addProduct, fetchStock } from '../../store/Slice/ProductSlice';
-import { Stock as Stocktype, Tank as TankType } from '../../types/productType';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-import Modal from '../../components/Modal';
-import TableHeader from '../components/tableHeader';
-import TableBody from '../components/tableBody';
 import { CreditSale } from '../../types/finance';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
 
 const CreditSales = () => {
-  const [TankModal, setTankModal] = useState(false);
   const Data = useAppSelector((state) => state.sales.creditSales);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const allFields: (keyof CreditSale)[] = [
-    'date',
-    'product',
-    'creditor',
-    'litres',
-    'unit_price',
-    'discount',
-    'Meter',
-    'shift',
-    'amount',
-    'discount_amount',
-    'supervisor',
-  ];
   const tableRow: (keyof CreditSale | string)[] = [
     'date',
     'product.name',

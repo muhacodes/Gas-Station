@@ -86,7 +86,7 @@ const ProductComponent = () => {
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Creditors " />
+        <Breadcrumb pageName="Products " />
         <ModalComponent     />
         <TableComponent
           data={getFilteredData()}

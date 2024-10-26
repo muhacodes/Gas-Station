@@ -43,7 +43,9 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      
       serializableCheck: {
+        
         // Ignore these action types
         ignoredActions: [
           'persist/PERSIST',
@@ -59,6 +61,7 @@ export const store = configureStore({
         // Optionally, ignore these paths in the state
         ignoredPaths: ['items.dates'],
       },
+      immutableCheck: false
     }),
   // middleware and other store enhancers if any
 });
