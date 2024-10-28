@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import {fetchPumpSummary} from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import {ExpenseType } from '../../types/finance';
+import {expense_type } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
 import { addExpense } from '../../store/Slice/Expenses';
 import { showNotificationWithTimeout } from '../../store/Slice/Notification';
@@ -35,7 +35,7 @@ const ExpenseAdd = () => {
     autocompleteOptions?: Option[];
   };
 
-  const handleSubmit = async (data: ExpenseType) => {
+  const handleSubmit = async (data: expense_type) => {
     setLoading(true);
     try {
       console.log(data);
@@ -60,7 +60,7 @@ const ExpenseAdd = () => {
       setLoading(false);
     }
   };
-  const fields: FormField<ExpenseType>[] = [
+  const fields: FormField<expense_type>[] = [
     {
       name: 'date',
       label: 'Date',
@@ -125,7 +125,7 @@ const ExpenseAdd = () => {
       )}
       <div className="mx-auto">
         <Breadcrumb pageName="Expense / Add " />
-        <FormContainerComponent<ExpenseType>
+        <FormContainerComponent<expense_type>
           fields={fields}
           onSubmit={handleSubmit}
           loading={loading}

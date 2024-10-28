@@ -12,6 +12,16 @@ import { fetchDrop } from '../../store/Slice/Sales';
 const SalesPaymentDrop = () => {
   const [dropModa, setDropModal] = useState(false);
   const Data = useAppSelector((state) => state.sales.drop);
+
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+
+  const [startDate, endDate] = dateRange;
+  const [loading, setLoading] = useState(false);
+
+
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
@@ -63,14 +73,42 @@ const SalesPaymentDrop = () => {
     </Modal>
   );
 
-  // const fetch = async() => {
-  //   const result = await dispatch(fetchDrop())
-  //   console.log(result.payload);
-  // }
-  // useEffect(() => {
-  //   fetch();
-  // }, [])
+  const onDateChange = (update: [Date | null, Date | null]) => {
+    // onChange={(update) => {
+    //   setDateRange(update);
+    // }}
+    setDateRange(update);
+    const [newStartDate, newEndDate] = update;
+    console.log('Starting Date:', newStartDate);
+    console.log('Ending Date:', newEndDate);
 
+    if (newStartDate && newEndDate) {
+      // Call fetch when both dates are selected
+      FilterDataByDate(newStartDate, newEndDate);
+    }
+  };
+
+  const FilterDataByDate = async (startDate: Date, endDate: Date) => {
+    // Format dates as YYYY-MM-DD in local time
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    const StartDate = formatDate(startDate);
+    const EndDate = formatDate(endDate);
+
+    try {
+      setLoading(true)
+
+      await dispatch(fetchDrop({startDate : StartDate, endDate : EndDate})).unwrap();
+      setLoading(false)
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   return (
     <>
       <DefaultLayout>
@@ -81,6 +119,10 @@ const SalesPaymentDrop = () => {
           fields={tableRow}
           setNewEntryModal={setDropModal}
           customTitles={customTitles}
+          isLoading={loading}
+          filterByDate={onDateChange}
+          startDate={startDate}
+          endDate={endDate}
           moneyFields={moneyFields}
           filterData={filterData}
           filterDataBy="date"

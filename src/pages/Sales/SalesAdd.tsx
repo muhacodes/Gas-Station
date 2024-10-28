@@ -15,9 +15,10 @@ const SalesAdd = () => {
   const navigate = useNavigate();
   const [Error, setError] = useState<Record<string, string[]>>({});
   const meter = useAppSelector((state) => state.tank.Meter);
+  const station = useAppSelector((state) => state.client.GasStation);
 
   const [formData, setFormData] = useState<sales>({
-    station: '1',
+    station: station.id!,
     date: '',
     closing: '',
     agent: '1',
@@ -56,7 +57,7 @@ const SalesAdd = () => {
     try {
       console.log(formData);
       await dispatch(addSales(formData)).unwrap(); 
-      await dispatch(fetchPumpSummary()).unwrap();
+      await dispatch(fetchPumpSummary({})).unwrap();
       navigate('/sales');
     } catch (error: any) {
       // The error object here is the thrown responseData object

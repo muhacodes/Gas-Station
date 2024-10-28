@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/customHooks'; // Adjust the import path as necessary
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Meter, Product, Tank as TankType } from '../../types/productType';
-import { addProduct, updateProduct } from '../../store/Slice/ProductSlice'; // Adjust your import for update
+import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
+import { Meter, Product, Tank as TankType } from '../../types/productType';// Adjust your import for update
 import { addMeter, addTank } from '../../store/Slice/Tank';
 
 interface TankAddProps {
@@ -15,8 +12,9 @@ const MeterAdd: React.FC<TankAddProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const tank = useAppSelector((state) => state.tank.Tank);
   const pump = useAppSelector((state) => state.product.pump);
+  const station = useAppSelector((state) => state.client.GasStation);
   const [formData, setFormData] = useState<Meter>({
-    station: '1',
+    station: station.id!,
     name: '',
     pump: null,
     tank: null,

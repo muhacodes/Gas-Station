@@ -4,15 +4,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-import { useAppSelector } from '../../hooks/customHooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { pump_sales_type } from '../../types/sales';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
+import { fetchPumpSummary } from '../../store/Slice/Sales';
 
 const PumpSalesSummary = () => {
   const Data = useAppSelector((state) => state.sales.pump_sales);
+  const dispatch = useAppDispatch();
+
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [startDate, endDate] = dateRange;
+  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -73,7 +82,44 @@ const PumpSalesSummary = () => {
 
     return currentData;
   };
-  
+  const onDateChange = (update: [Date | null, Date | null]) => {
+    // onChange={(update) => {
+    //   setDateRange(update);
+    // }}
+    setDateRange(update);
+    const [newStartDate, newEndDate] = update;
+    console.log('Starting Date:', newStartDate);
+    console.log('Ending Date:', newEndDate);
+
+    if (newStartDate && newEndDate) {
+      // Call fetch when both dates are selected
+      FilterDataByDate(newStartDate, newEndDate);
+    }
+  };
+
+  const FilterDataByDate = async (startDate: Date, endDate: Date) => {
+    // Format dates as YYYY-MM-DD in local time
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    const StartDate = formatDate(startDate);
+    const EndDate = formatDate(endDate);
+
+    try {
+      console.log('start Date ', StartDate);
+      console.log('End Date ', EndDate);
+      setLoading(true)
+
+      await dispatch(fetchPumpSummary({startDate : StartDate, endDate : EndDate})).unwrap();
+      setLoading(false)
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   return (
     <>
@@ -86,6 +132,10 @@ const PumpSalesSummary = () => {
           moneyFields={moneyFields}
           filterDataBy="Date, Shift, Pump"
           filterData={filterData}
+          isLoading={loading}
+          filterByDate={onDateChange}
+          startDate={startDate}
+          endDate={endDate}
           tableHeading='Pump Summary'
           Pagination={
             <Pagination

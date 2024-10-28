@@ -1,7 +1,11 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { LoaderIcon } from 'react-hot-toast';
+import Loading from '../../components/Loading';
 
 type Option = {
   value: string;
@@ -13,8 +17,7 @@ type TableComponentProps<T> = {
   fields: (keyof T | string)[]; // Including 'actions' as string in fields
   customTitles?: Partial<Record<keyof T, string>>; // Optional mapping of field names to custom titles
   moneyFields?: (keyof T | string)[]; // Fields that represent money
-  onEdit?: (item: T) => void; // Optional edit callback
-  onDelete?: (item: T) => void; // Optional delete callback
+
   actions?: boolean;
   Pagination?: React.ReactNode; // Add pagination as a ReactNode
   renderActions?: (item: T) => React.ReactNode; // Add renderActions prop
@@ -23,7 +26,12 @@ type TableComponentProps<T> = {
   newEntryUrl?: string;
   setNewEntryModal?: (isOpen: boolean) => void;
   ExtraOptions?: React.FC; // Define the prop as a React component
-  tableHeading?: string,
+  tableHeading?: string;
+  isLoading?: Boolean;
+  startDate?: Date | null;
+  endDate?: Date | null;
+  dateRange?: Date | null;
+  filterByDate?: (date: any) => void;
 };
 
 // Helper function to access nested properties safely
@@ -41,8 +49,6 @@ const TableComponent = <T extends object>({
   fields,
   customTitles = {},
   moneyFields = [],
-  onEdit,
-  onDelete,
   Pagination, // Accept the pagination prop
   renderActions,
   filterData,
@@ -50,15 +56,24 @@ const TableComponent = <T extends object>({
   newEntryUrl,
   setNewEntryModal: setProductModal,
   ExtraOptions,
-  tableHeading
+  tableHeading,
+  endDate,
+  startDate,
+  filterByDate,
+  isLoading,
 }: TableComponentProps<T>) => {
   const [visibleFields, setVisibleFields] =
     useState<(keyof T | string)[]>(fields);
-    const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  // const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+  //   null,
+  //   null,
+  // ]);
+  // const [startDate, endDate] = dateRange;
 
-    const toggleDropdown = () => {
-      setDropdownVisible(!dropdownVisible);
-    };
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
 
   const handleFieldVisibilityChange = (field: keyof T | string) => {
     setVisibleFields(
@@ -75,7 +90,7 @@ const TableComponent = <T extends object>({
         <div className="max-w-full overflow-x-auto lg:overflow-">
           {tableHeading ? <strong> {tableHeading} </strong> : ''}
           <div className="flex my-5 justify-between">
-            <div className="w-90">
+            <div className="flex items-center gap-10">
               {/* Whenever a user enters search here, filter the students based on firstname, lastname, dob */}
               {filterDataBy && (
                 <input
@@ -87,7 +102,30 @@ const TableComponent = <T extends object>({
                   className="w-full p-4 text-gray-700 bg-transparent border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 ease-in-out"
                 />
               )}
+              {filterByDate ? (
+                <DatePicker
+                  className="border bg-white dark:bg-boxdark p-4 rounded-lg"
+                  placeholderText="Filter by Date"
+                  selectsRange={true}
+                  startDate={startDate!}
+                  endDate={endDate!}
+                  onChange={(update) => {
+                    // // setDateRange(update);
+                    // setDateRange(update as [Date | null, Date | null]);
+                    // const [newStartDate, newEndDate] = update as [
+                    //   Date | null,
+                    //   Date | null,
+                    // ];
+                    // console.log('Start Date:', newStartDate);
+                    // console.log('End Date:', newEndDate);
+                    filterByDate!(update);
+                  }}
+                />
+              ) : (
+                ''
+              )}
             </div>
+
             <div className="flex items-center gap-4">
               {!newEntryUrl ? (
                 <button
@@ -106,88 +144,94 @@ const TableComponent = <T extends object>({
                 </Link>
               )}
               {ExtraOptions ? <ExtraOptions /> : <p></p>}
-              
             </div>
           </div>
-          <table className="w-full table-auto">
-            {/* Table Header */}
-            <thead>
-              <tr className="bg-slate-700 text-white text-left dark:bg-meta-4">
-                {visibleFields.map((field) => (
-                  <th
-                    key={String(field)}
-                    className="min-w-[50px] py-3 px-2 font-medium dark:text-white"
-                  >
-                    {customTitles[field as keyof T] ||
-                      String(field).charAt(0).toUpperCase() +
-                        String(field).slice(1)}{' '}
-                  </th>
-                ))}
-                {renderActions && (
-                  <th className="min-w-[50px] py-3 px-2 font-medium dark:text-white">
-                    Actions
-                  </th>
-                )}
-                {/* Render Actions column if provided */}
-              </tr>
-            </thead>
+          <div className="relative">
+            {isLoading ? <Loading /> : ''}
+            <table className={`w-full table-auto`}>
+              {/* {isLoading ? <FontAwesomeIcon className='absolute top-0 bg-red-800 '  icon={faSpinner} spin={true} /> : ''} */}
+              {/* Table Header */}
+              <thead>
+                <tr className="bg-slate-700 text-white text-left dark:bg-meta-4">
+                  {visibleFields.map((field) => (
+                    <th
+                      key={String(field)}
+                      className="min-w-[50px] py-3 px-2 font-medium dark:text-white"
+                    >
+                      {customTitles[field as keyof T] ||
+                        String(field).charAt(0).toUpperCase() +
+                          String(field).slice(1)}{' '}
+                    </th>
+                  ))}
+                  {renderActions && (
+                    <th className="min-w-[50px] py-3 px-2 font-medium dark:text-white">
+                      Actions
+                    </th>
+                  )}
+                  {/* Render Actions column if provided */}
+                </tr>
+              </thead>
 
-            {/* Table Body */}
-            <tbody>
-              {data.map((item, index) => (
-                <tr className='hover:bg-slate-200 dark:hover:bg-slate-700' key={index}>
-                  {visibleFields.map((field) => {
-                    const value = getValue(item, String(field));
-                    if (typeof value === 'string' && isNumericString(value)) {
-                      // Check if the field is in moneyFields to format as currency
-                      if (moneyFields.includes(field)) {
-                        const parsedValue = parseFloat(value);
+              {/* Table Body */}
+              <tbody className={`${isLoading ? 'opacity-25' : ''}`}>
+                {data.map((item, index) => (
+                  <tr
+                    className="hover:bg-slate-200 dark:hover:bg-slate-700"
+                    key={index}
+                  >
+                    {visibleFields.map((field) => {
+                      const value = getValue(item, String(field));
+                      if (typeof value === 'string' && isNumericString(value)) {
+                        // Check if the field is in moneyFields to format as currency
+                        if (moneyFields.includes(field)) {
+                          const parsedValue = parseFloat(value);
+                          return (
+                            <td
+                              key={String(field)}
+                              className="border-b border-[#eee] py-2 px-2 dark:border-strokedark"
+                            >
+                              {parsedValue.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{' '}
+                              {/* Format as currency with 2 decimal places */}
+                            </td>
+                          );
+                        }
                         return (
                           <td
                             key={String(field)}
                             className="border-b border-[#eee] py-2 px-2 dark:border-strokedark"
                           >
-                            {parsedValue.toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{' '}
-                            {/* Format as currency with 2 decimal places */}
+                            {/* {parsedValue.toLocaleString()}{' '} */}
+                            {value}
+                            {/* Format as general numeric value */}
                           </td>
                         );
                       }
+
                       return (
                         <td
                           key={String(field)}
                           className="border-b border-[#eee] py-2 px-2 dark:border-strokedark"
                         >
-                          {/* {parsedValue.toLocaleString()}{' '} */}
-                          {value}
-                          {/* Format as general numeric value */}
+                          {typeof value === 'object' && value !== null
+                            ? JSON.stringify(value) // Handle objects
+                            : String(value)}{' '}
+                          {/* Handle other types */}
                         </td>
                       );
-                    }
-
-                    return (
-                      <td
-                        key={String(field)}
-                        className="border-b border-[#eee] py-2 px-2 dark:border-strokedark"
-                      >
-                        {typeof value === 'object' && value !== null
-                          ? JSON.stringify(value) // Handle objects
-                          : String(value)}{' '}
-                        {/* Handle other types */}
+                    })}
+                    {renderActions && (
+                      <td className="border-b border-[#eee] py-2 px-2 dark:border-strokedark">
+                        {renderActions(item)} {/* Render action buttons */}
                       </td>
-                    );
-                  })}
-                  {renderActions && (
-                    <td className="border-b border-[#eee] py-2 px-2 dark:border-strokedark">
-                      {renderActions(item)} {/* Render action buttons */}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {Pagination && Pagination}
         </div>
       </div>

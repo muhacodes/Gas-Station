@@ -42,18 +42,21 @@ import CreditSalesAdd from './pages/Sales/CreditSalesAdd';
 import DippingAdd from './pages/Tank/DippingAdd';
 import Discount from './pages/Sales/Discount';
 import DiscountAdd from './pages/Sales/DiscountAdd';
-import Loading from './components/Loading';
 import SalesPayment from './pages/Sales/SalesPayment';
 import SalesPaymentAdd from './pages/Sales/SalesPaymentAdd';
 import SalesPaymentDrop from './pages/Sales/SalesPaymentDrop';
 import PumpSalesSummary from './pages/Sales/PumpSaes';
 import Staff from './pages/Client/Staff';
-import { fetchStaff, GetStation } from './store/Slice/Client';
+import { fetchCashBook, fetchStaff, GetStation } from './store/Slice/Client';
 import StaffAdd from './pages/Client/StaffAdd';
 import { getExpense } from './store/Slice/Expenses';
 import Expenses from './pages/Expenses/Expenses';
 import ExpenseAdd from './pages/Expenses/ExpensesAdd';
 import UploadData from './pages/Client/UploadData';
+import CashBook from './pages/overview/cash';
+import Loading from './components/Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 // import Calendar from './pages/Calendar
 
@@ -75,15 +78,16 @@ function App() {
         dispatch(fetchMeter()).unwrap(),
         dispatch(fetchTank()).unwrap(),
         dispatch(fetchFuelDelivery()).unwrap(),
-        dispatch(fetchDipping()).unwrap(),
-        dispatch(fetchSales()).unwrap(),
-        dispatch(fetchCreditSales()).unwrap(),
+        dispatch(fetchDipping({})).unwrap(),
+        dispatch(fetchSales({})).unwrap(),
+        dispatch(fetchCreditSales({})).unwrap(),
         dispatch(fetchDiscount()).unwrap(),
         dispatch(fetchSalesPayment()).unwrap(),
-        dispatch(fetchDrop()).unwrap(),
-        dispatch(fetchPumpSummary()).unwrap(),
+        dispatch(fetchDrop({})).unwrap(),
+        dispatch(fetchPumpSummary({})).unwrap(),
+        dispatch(fetchCashBook({})).unwrap(),
         dispatch(fetchStaff()).unwrap(),
-        dispatch(getExpense()).unwrap(),
+        dispatch(getExpense({})).unwrap(),
       ]);
       setLoading(false);
       const endTime = performance.now(); // End timer
@@ -108,6 +112,13 @@ function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-white dark:bg-graydark  z-50">
+        <FontAwesomeIcon icon={faSpinner} spin={true} className="text-2xl" />
+      </div>
+    );
+  }
   return (
     <>
       <Routes>
@@ -432,6 +443,18 @@ function App() {
               <>
                 <PageTitle title="Expenses/Add" />
                 <ExpenseAdd />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cash-book"
+          element={
+            <ProtectedRoute>
+              <>
+                <PageTitle title="Cash Book" />
+                <CashBook />
               </>
             </ProtectedRoute>
           }

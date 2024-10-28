@@ -45,8 +45,14 @@ export const addExpense = createAsyncThunk(
 
 export const getExpense = createAsyncThunk(
   'expense/fetch',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/expenses`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/expenses`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/expenses`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -70,7 +76,7 @@ export const ExpenseSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Handle fetchProduct
-    handleAsyncThunk<ExpenseState, ExpenseType[], void>(builder, getExpense, {
+    handleAsyncThunk<ExpenseState, ExpenseType[], {}>(builder, getExpense, {
       dataKey: 'expenses',
       errorKey: 'error',
       loadingKey: 'loading',

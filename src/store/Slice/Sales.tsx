@@ -33,8 +33,14 @@ const initialState: SalesCreditState = {
 
 export const fetchSales = createAsyncThunk(
   'sales/fetch',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/sales`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/sales`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/sales`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -147,8 +153,14 @@ export const addCreditors = createAsyncThunk(
 
 export const fetchCreditSales = createAsyncThunk(
   'creditSales/fetch',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/credit_sales`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/credit_sales`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/credit_sales`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -238,8 +250,14 @@ export const addDiscount = createAsyncThunk(
 
 export const fetchDrop = createAsyncThunk(
   'drop/fetch',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/sales_drop`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/sales_drop`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/sales_drop`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -284,8 +302,14 @@ export const addDrop = createAsyncThunk(
 
 export const fetchPumpSummary = createAsyncThunk(
   'pump/summary',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/pump/summary`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/pump/summary`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/pump/summary`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -300,8 +324,6 @@ export const fetchPumpSummary = createAsyncThunk(
     }
   },
 );
-
-
 
 
 export const fetchSalesPayment = createAsyncThunk(
@@ -357,7 +379,7 @@ export const SalesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     // Handle fetchProduct
-    handleAsyncThunk<SalesCreditState, sales[], void>(builder, fetchSales, {
+    handleAsyncThunk<SalesCreditState, sales[], {}>(builder, fetchSales, {
       dataKey: 'sales',
       errorKey: 'error',
       loadingKey: 'loading',
@@ -393,7 +415,7 @@ export const SalesSlice = createSlice({
       loadingKey: 'loading',
     });
 
-    handleAsyncThunk<SalesCreditState, CreditSale[], void>(builder, fetchCreditSales, {
+    handleAsyncThunk<SalesCreditState, CreditSale[], {}>(builder, fetchCreditSales, {
       dataKey: 'creditSales',
       errorKey: 'error',
       loadingKey: 'loading',
@@ -435,7 +457,7 @@ export const SalesSlice = createSlice({
       loadingKey: 'loading',
     });
 
-    handleAsyncThunk<SalesCreditState, payment_drop_type[], void>(builder, fetchDrop, {
+    handleAsyncThunk<SalesCreditState, payment_drop_type[], {}>(builder, fetchDrop, {
       dataKey: 'drop',
       errorKey: 'error',
       loadingKey: 'loading',
@@ -449,7 +471,7 @@ export const SalesSlice = createSlice({
     });
 
 
-    handleAsyncThunk<SalesCreditState, pump_sales_type[], void>(builder, fetchPumpSummary, {
+    handleAsyncThunk<SalesCreditState, pump_sales_type[], {}>(builder, fetchPumpSummary, {
       dataKey: 'pump_sales',
       errorKey: 'error',
       loadingKey: 'loading',

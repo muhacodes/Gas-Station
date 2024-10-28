@@ -1,18 +1,24 @@
 import { useState } from 'react';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
 
-import { useAppSelector } from '../../hooks/customHooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { sales } from '../../types/sales';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
+import { fetchSales } from '../../store/Slice/Sales';
 
 const Sales = () => {
   const Data = useAppSelector((state) => state.sales.sales);
+  const dispatch = useAppDispatch();
+
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [startDate, endDate] = dateRange;
+  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(''); // State to manage the search query
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -42,12 +48,6 @@ const Sales = () => {
     console.log('Edit record', record);
     alert(record.Meter?.station);
     // Logic for editing the record
-  };
-
-  // Handle the delete action
-  const handleDelete = (record: sales) => {
-    console.log('Delete record', record);
-    // Logic for deleting the record
   };
 
   const filterData = (query: string) => {
@@ -80,22 +80,42 @@ const Sales = () => {
     return currentData;
   };
 
-  const renderActions = (item: any) => (
-    <div className="flex gap-4">
-      <button
-        onClick={() => handleEdit(item)}
-        className="text-blue-500 hover:text-blue-700 p-2 bg-blue-100 rounded"
-      >
-        Edit
-      </button>
-      <button
-        onClick={() => handleDelete(item.id)}
-        className="text-red-500 hover:text-red-700 p-2 bg-red-100 rounded"
-      >
-        Delete
-      </button>
-    </div>
-  );
+  const onDateChange = (update: [Date | null, Date | null]) => {
+    // onChange={(update) => {
+    //   setDateRange(update);
+    // }}
+    setDateRange(update);
+    const [newStartDate, newEndDate] = update;
+    console.log('Starting Date:', newStartDate);
+    console.log('Ending Date:', newEndDate);
+
+    if (newStartDate && newEndDate) {
+      // Call fetch when both dates are selected
+      FilterDataByDate(newStartDate, newEndDate);
+    }
+  };
+
+  const FilterDataByDate = async (startDate: Date, endDate: Date) => {
+    // Format dates as YYYY-MM-DD in local time
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    const StartDate = formatDate(startDate);
+    const EndDate = formatDate(endDate);
+
+    try {
+      setLoading(true)
+
+      await dispatch(fetchSales({startDate : StartDate, endDate : EndDate})).unwrap();
+      setLoading(false)
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   return (
     <>
@@ -106,10 +126,12 @@ const Sales = () => {
           fields={tableRow}
           customTitles={customTitles}
           moneyFields={moneyFields}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          
+          filterByDate={onDateChange}
+          isLoading={loading}
+          startDate={startDate}
+          endDate={endDate}
           filterDataBy="Date, Pump, Meter"
-          // renderActions={renderActions}
           filterData={filterData}
           newEntryUrl="sales/add"
           Pagination={

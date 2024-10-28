@@ -1,15 +1,18 @@
-import {useState } from 'react';
+import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { CreditSale } from '../../types/finance';
+import { cash_book_type } from '../../types/finance';
 import TableComponent from '../components/TableComponent';
 import Pagination from '../components/PaginationComponent';
-import { fetchCreditSales } from '../../store/Slice/Sales';
+import React from 'react';
+import { LoaderIcon } from 'react-hot-toast';
+import { fetchCashBook, FilterCashBookByDate } from '../../store/Slice/Client';
+// import DatePicker from 'react-datepicker';
+// import 'react-datepicker/dist/react-datepicker.css';
 
-const CreditSales = () => {
-  const Data = useAppSelector((state) => state.sales.creditSales);
-
+const CashBook = () => {
+  const Data = useAppSelector((state) => state.client.cash_book);
   const dispatch = useAppDispatch();
 
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
@@ -25,30 +28,22 @@ const CreditSales = () => {
 
   const totalPages = Math.ceil(Data.length / itemsPerPage);
 
-  const tableRow: (keyof CreditSale | string)[] = [
+  const tableRow: (keyof cash_book_type)[] = [
     'date',
-    'product.name',
-    'creditor.customer',
-    'litres',
-    'unit_price',
-    'discount',
-    'Meter.name',
-    'shift',
-    'amount',
-    'discount_amount',
-    'supervisor',
+    'total_sales',
+    'total_credit',
+    'total_expense',
+    'net_cash',
   ];
   const customTitles = {
-    unit_price: 'Price',
-    discount_amount: 'Discounted',
-    'creditor.customer': 'Customer',
-    'Meter.name': 'Meter',
+    date: 'Date',
   };
 
-  const moneyFields: (keyof CreditSale)[] = [
-    'amount',
-    'discount',
-    'discount_amount',
+  const moneyFields: (keyof cash_book_type)[] = [
+    'net_cash',
+    'total_credit',
+    'total_sales',
+    'total_expense',
   ];
   const filterData = (query: string) => {
     setQuery(query); // Update search query state
@@ -59,9 +54,7 @@ const CreditSales = () => {
     let filtered = Data;
     if (query) {
       filtered = Data.filter((data) => {
-        return data.creditor?.customer
-          ?.toLocaleLowerCase()
-          .includes(query.toLocaleLowerCase());
+        return data.date.includes(query);
       });
       // filtered = Data.filter((sale) => Data.date.includes(query));
     }
@@ -73,6 +66,7 @@ const CreditSales = () => {
 
     return currentData;
   };
+
   const onDateChange = (update: [Date | null, Date | null]) => {
     // onChange={(update) => {
     //   setDateRange(update);
@@ -100,9 +94,11 @@ const CreditSales = () => {
     const EndDate = formatDate(endDate);
 
     try {
+      console.log('start Date ', StartDate);
+      console.log('End Date ', EndDate);
       setLoading(true)
 
-      await dispatch(fetchCreditSales({startDate : StartDate, endDate : EndDate})).unwrap();
+      await dispatch(fetchCashBook({startDate : StartDate, endDate : EndDate})).unwrap();
       setLoading(false)
       setCurrentPage(1);
     } catch (error) {
@@ -113,19 +109,19 @@ const CreditSales = () => {
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Creditors " />
+        <Breadcrumb pageName="Cash Book " />
+
         <TableComponent
           data={getFilteredData()}
           fields={tableRow}
           customTitles={customTitles}
           moneyFields={moneyFields}
-          filterData={filterData}
-          filterByDate={onDateChange}
           isLoading={loading}
+          filterData={filterData}
           startDate={startDate}
           endDate={endDate}
-          newEntryUrl="credit/sales/add"
-          filterDataBy="company"
+          filterByDate={onDateChange}
+          filterDataBy="Date"
           Pagination={
             <Pagination
               currentPage={currentPage}
@@ -134,9 +130,10 @@ const CreditSales = () => {
             />
           }
         />
+        <div></div>
       </DefaultLayout>
     </>
   );
 };
 
-export default CreditSales;
+export default CashBook;

@@ -125,8 +125,14 @@ export const addMeter = createAsyncThunk(
 
 export const fetchDipping = createAsyncThunk(
   'dipping/fetch',
-  async (_, thunkAPI) => {
-    const url = `${config.appUrl}/api/tankdipping`;
+  async ({ startDate, endDate }: { startDate?: string; endDate?: string }, thunkAPI) => {
+    // Construct the base URL
+    let url = `${config.appUrl}/api/tankdipping`;
+    // Append the date range query parameters if provided
+    if (startDate && endDate) {
+      url += `/?start_date=${startDate}&end_date=${endDate}`;
+    }
+    // const url = `${config.appUrl}/api/tankdipping`;
     try {
       const response = await fetchWithTokenRefresh(url);
       if (!response.ok) {
@@ -246,7 +252,7 @@ export const TankSlice = createSlice({
       errorKey: 'error',
       append: true,
     });
-    handleAsyncThunk<TankState, TankDipping[], void>(builder, fetchDipping, {
+    handleAsyncThunk<TankState, TankDipping[], {}>(builder, fetchDipping, {
       dataKey: 'TankDipping',
       loadingKey: 'Loading',
       errorKey: 'error',
