@@ -19,6 +19,7 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const product = useAppSelector((state) => state.product.products);
+  const station = useAppSelector((state) => state.client.GasStation);
   const [error, setError] = useState<Record<string, string[]>>({});
   const pump = useAppSelector((state) => state.product.pump);
   const navigate = useNavigate();
@@ -41,8 +42,8 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
     try {
       console.log(data);
       await dispatch(addDrop(data)).unwrap(); // Unwrap to catch the error
-      await dispatch(fetchPumpSummary()).unwrap();
-      onClose()
+      await dispatch(fetchPumpSummary({})).unwrap();
+      onClose();
     } catch (error: any) {
       // The error object here is the thrown responseData object
       if (error && error.errors) {
@@ -65,14 +66,12 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
       name: 'date',
       label: 'Date',
       type: 'date',
-      //   required: true,
     },
 
     {
       name: 'amount',
       label: 'Amount',
       type: 'text',
-      //   required: true,
     },
 
     {
@@ -85,13 +84,6 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
       })),
     },
 
-    // {
-    //   name: '',
-    //   label: 'Transaction No',
-    //   type: 'text',
-    //   //   required: true,
-    // },
-
     {
       name: 'shift',
       label: 'Shift',
@@ -102,7 +94,6 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
           label: Object.keys(value)[0],
         }),
       ),
-      //   required: true,
     },
   ];
 
@@ -113,7 +104,7 @@ const DropAddModalForm: React.FC<dropAddProps> = ({ onClose }) => {
         onSubmit={handleSubmit}
         loading={loading}
         initialValues={{
-          station: '1',
+          station: station.id!,
           agent: '1',
           supervisor: '1',
         }}

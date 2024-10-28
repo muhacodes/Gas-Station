@@ -40,7 +40,7 @@ const DiscountAdd = () => {
       console.log(data);
       await dispatch(addDiscount(data)).unwrap(); // Unwrap to catch the error
       await dispatch(fetchDiscount()).unwrap(); // Unwrap to catch the error
-      await dispatch(fetchPumpSummary()).unwrap()
+      await dispatch(fetchPumpSummary({})).unwrap()
       navigate('/discount');
     } catch (error: any) {
       // The error object here is the thrown responseData object

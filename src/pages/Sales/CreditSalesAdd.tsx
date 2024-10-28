@@ -40,7 +40,7 @@ const CreditSalesAdd = () => {
     try {
       console.log(data);
       await dispatch(addCreditSales(data)).unwrap(); // Unwrap to catch the error
-      await dispatch(fetchPumpSummary()).unwrap()
+      await dispatch(fetchPumpSummary({})).unwrap()
       dispatch(showNotificationWithTimeout('Succesfully added Credit Sales, Creditor amount has been updated!!', 'success'))
       // dispatch(showNotificationWithTimeout('Creditor Amount has been updated', 'info'))
       navigate('/credit/sales');

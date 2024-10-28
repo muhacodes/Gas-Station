@@ -3,10 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/customHooks';
-import { addCreditSales, addSalesPayment, fetchPumpSummary } from '../../store/Slice/Sales';
+import { addSalesPayment, fetchPumpSummary } from '../../store/Slice/Sales';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import { CreditSale } from '../../types/finance';
 import FormContainerComponent from '../components/FormContainer';
 import { sales_payment_type } from '../../types/sales';
 
@@ -16,6 +15,7 @@ const SalesPaymentAdd = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<Record<string, string[]>>({});
   const pump = useAppSelector((state) => state.product.pump);
+  const station = useAppSelector((state) => state.client.GasStation);
 
   interface Option {
     value: string;
@@ -36,7 +36,7 @@ const SalesPaymentAdd = () => {
     try {
       console.log(data);
       await dispatch(addSalesPayment(data)).unwrap(); // Unwrap to catch the error
-      await dispatch(fetchPumpSummary()).unwrap()
+      await dispatch(fetchPumpSummary({})).unwrap()
       navigate('/sales-payment');
     } catch (error: any) {
       // The error object here is the thrown responseData object
@@ -116,7 +116,7 @@ const SalesPaymentAdd = () => {
           onSubmit={handleSubmit}
           loading={loading}
           initialValues={{
-            station: '1',
+            station: station.id!,
             payment_method: '1',
             agent: '1',
             supervisor: '1',

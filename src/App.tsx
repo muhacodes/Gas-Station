@@ -106,7 +106,7 @@ function App() {
     }
     fetch();
     console.log(auth);
-  }, []);
+  }, [auth]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
