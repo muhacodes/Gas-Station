@@ -121,7 +121,7 @@ const Creditors = () => {
       try {
         
         await dispatch(DeleteCreditors(selectedCreditor)).unwrap(),
-        await dispatch(fetchCreditSales()).unwrap();
+        await dispatch(fetchCreditSales({})).unwrap();
       } catch (Error: any) {
         console.log('Error returned is ', Error);
       }

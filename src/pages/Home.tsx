@@ -5,7 +5,10 @@ const Home = () => {
   return (
     <>
       <DefaultLayout>
-        <Breadcrumb pageName="Home" />
+        <div className="mx-auto">
+          <Breadcrumb pageName="Home" />
+          
+        </div>
       </DefaultLayout>
     </>
   );
